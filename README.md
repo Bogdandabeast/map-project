@@ -53,6 +53,62 @@ Para ejecutar este proyecto, necesitas tener instalado:
 -   **Base de Datos:** [PostgreSQL 18](https://www.postgresql.org/) con la extensión espacial [PostGIS 3.6](https://postgis.net/).
 -   **Monorepo:** [Turborepo](https://turbo.build/repo), optimiza las tareas de construcción y linting mediante cache inteligente.
 
+## 📦 Gestión de Dependencias
+
+Para añadir nuevas librerías a los proyectos, utiliza el comando `bun add` con el flag `--filter` para especificar la aplicación o paquete:
+
+### En el Frontend (Ionic React)
+```bash
+bun add <nombre-paquete> --filter apps-frontend
+```
+
+### En el Backend (Hono)
+```bash
+bun add <nombre-paquete> --filter backend
+```
+
+### Dependencias de Desarrollo (en la raíz o un proyecto específico)
+```bash
+# En el backend como devDependency
+bun add -d <nombre-paquete> --filter backend
+
+# En la raíz del monorepo (globales)
+bun add -d <nombre-paquete> -w
+```
+
+---
+
+## 🧪 Metodología de Desarrollo: TDD (Test Driven Development)
+
+Este proyecto sigue rigurosamente la metodología TDD para asegurar la robustez del código. El ciclo es:
+1.  **Red:** Escribir un test que falle para la funcionalidad deseada.
+2.  **Green:** Escribir el código mínimo necesario para que el test pase.
+3.  **Refactor:** Limpiar y mejorar el código manteniendo los tests en verde.
+
+### Ejecutar Tests
+-   **Backend:** `bun test --filter backend`
+-   **Frontend (Unitarios):** `bun run test.unit --filter apps-frontend`
+
+---
+
+## 📝 Convención de Commits
+
+Para mantener un historial limpio y compatible con herramientas de automatización, utilizamos **Conventional Commits**. El formato es:
+
+`<tipo>[alcance opcional]: <descripción>`
+
+### Tipos comunes:
+-   `feat`: Una nueva funcionalidad.
+-   `fix`: Solución de un bug.
+-   `docs`: Cambios en la documentación.
+-   `style`: Cambios que no afectan el significado del código (espacios, formato, etc.).
+-   `refactor`: Cambio en el código que ni corrige un bug ni añade una funcionalidad.
+-   `test`: Añadir tests faltantes o corregir existentes.
+-   `chore`: Cambios en el proceso de construcción o herramientas auxiliares.
+
+### Ejemplo:
+`feat(backend): añadir endpoint de geolocalización`
+
 ---
 
 ## ⚡ Comandos Útiles
