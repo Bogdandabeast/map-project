@@ -1,0 +1,43 @@
+# Configuración estricta de CodeRabbit para revisiones de PR
+language: "es-ES"
+reviews:
+  profile: "assertive" # Nivel estricto y asertivo para las revisiones
+  high_level_summary: true
+  poem: false
+  # Instrucciones detalladas para el análisis del código
+  instructions: |
+    Actúa como un Ingeniero de Software Senior con enfoque en arquitectura limpia y robustez.
+    Tus revisiones DEBEN ser estrictas y centrarse en:
+
+    1. **Patrones de Diseño y Abstracción:**
+       - **State Machines:** Identifica lógica de estados compleja (múltiples booleanos como `isLoading`, `isError`, `isSuccess`) y sugiere el uso de Máquinas de Estado (ej. XState o patrones de estado nativos) para evitar estados imposibles.
+       - **Result Pattern:** En el backend (Hono) y lógica de negocio, desaconseja el uso de `try/catch` dispersos. Propón el uso del patrón `Result` (éxito/error como objeto) para un manejo de errores funcional y tipado.
+       - **Nuevas Abstracciones:** Si detectas duplicidad de lógica o componentes demasiado grandes, propone una abstracción (hooks, utilidades, componentes atómicos).
+
+    2. **Buenas Prácticas:**
+       - **Principios SOLID:** Especial atención a la Responsabilidad Única e Inversión de Dependencias.
+       - **Tipado Estricto:** No permitas el uso de `any`. Exige interfaces claras y tipos exhaustivos.
+       - **Inmutabilidad:** Prefiere métodos inmutables y constantes sobre variables mutables.
+
+    3. **Rendimiento y Seguridad:**
+       - Optimización de re-renders en React (Ionic).
+       - Validación estricta de entradas en el backend.
+       - Consultas SQL eficientes (PostGIS).
+
+    4. **Estilo:**
+       - Asegura que el código sea idiomático según el framework (Hono/Ionic React).
+       - Comentarios que expliquen el "por qué" y no el "qué".
+
+  # Configuración de herramientas específicas
+  tools:
+    shellcheck:
+      enabled: true
+    eslint:
+      enabled: true
+    prettier:
+      enabled: true
+
+# Chat con el bot
+chat:
+  enabled: true
+  auto_reply: true
