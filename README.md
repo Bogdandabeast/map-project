@@ -51,6 +51,7 @@ Para ejecutar este proyecto, necesitas tener instalado:
 -   **Frontend:** [Ionic Framework](https://ionicframework.com/) con React, Vite para el empaquetado y Capacitor para despliegue nativo.
 -   **Backend:** [Hono](https://hono.dev/), un framework ultra rápido para TypeScript que corre nativamente en Bun.
 -   **Base de Datos:** [PostgreSQL 18](https://www.postgresql.org/) con la extensión espacial [PostGIS 3.6](https://postgis.net/).
+-   **OGC Server** [GeoServer](https://geoserver.org/), un servidor de código abierto para compartir datos geoespaciales.
 -   **Monorepo:** [Turborepo](https://turbo.build/repo), optimiza las tareas de construcción y linting mediante cache inteligente.
 
 ## 📦 Gestión de Dependencias
@@ -158,4 +159,20 @@ La base de datos está configurada con las siguientes credenciales por defecto (
 Para ver el estado de la base de datos:
 ```bash
 docker ps -f name=postgres18_postgis
+```
+---
+
+## 🗺️ OGC server (GeoServer)
+Geoserver expone un panel de control en [GeoServer](http://localhost:8080/geoserver/web/) donde poder crear los geo-servicios siguiendo los estándares del consorcio abierto geoespacial [OCG Consortium](https://www.ogc.org/es/)
+
+El servidor está configurado con las siguientes credenciales por defecto (modificar para producción):
+
+-   **Host:** `localhost`
+-   **Puerto:** `8080`
+-   **Usuario:** `admin`
+-   **Contraseña:** `geoserver`
+
+Para ver el estado del servidor:
+```bash
+docker ps -f name=geoserver
 ```
