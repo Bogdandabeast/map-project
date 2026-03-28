@@ -1,4 +1,19 @@
 #!/bin/sh
 
-echo "🔍 Running backend tests..."
-bun test apps/backend/tests || exit 1
+ROOT="$(git rev-parse --show-toplevel)"
+
+run_step() {
+  echo "$1"
+  shift
+  "$@" || exit 1
+}
+
+run_frontend_tests() {
+  echo "🧪 Running frontend tests..."
+  cd "$ROOT/apps/frontend" || exit 1
+  bun run test.unit || exit 1
+  cd "$ROOT" || exit 1
+}
+
+run_step "🔍 Running backend tests..." bun test "$ROOT/apps/backend/tests"
+run_frontend_tests
