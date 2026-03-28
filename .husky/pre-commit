@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "🔍 Running backend tests..."
+bun test apps/backend/tests || exit 1
