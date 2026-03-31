@@ -1,0 +1,46 @@
+{
+  "name": "apps-frontend",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "description": "An Ionic project",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test.e2e": "cypress run",
+    "test.unit": "vitest run",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.0",
+    "@capacitor/core": "8.3.0",
+    "@capacitor/haptics": "8.0.1",
+    "@capacitor/keyboard": "8.0.2",
+    "@capacitor/status-bar": "8.0.2",
+    "@ionic/react": "^8.5.0",
+    "@ionic/react-router": "^8.5.0",
+    "ionicons": "^7.4.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-router": "^5.3.4",
+    "react-router-dom": "^5.3.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.3.0",
+    "@repo/eslint-config": "workspace:*",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/react": "19.0.10",
+    "@types/react-dom": "19.0.4",
+    "@types/react-router": "^5.1.20",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-legacy": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.1",
+    "cypress": "^13.5.0",
+    "terser": "^5.4.0",
+    "typescript": "~5.9.0",
+    "vite": "^5.0.0",
+    "vitest": "^0.34.6"
+  }
+}
