@@ -1,26 +1,32 @@
 {
   "name": "my-monorepo",
   "private": true,
+  "packageManager": "bun@1.3.4",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "docker compose up -d && turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^7.7.3",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@repo/eslint-config": "workspace:*",
+    "eslint": "^9.39.1",
     "husky": "^9.1.7",
-    "prettier": "^3.7.4",
+    "lint-staged": "^16.4.0",
     "turbo": "^2.8.20",
-    "typescript": "5.9.2"
+    "typescript": "^5.9.2"
   },
-  "engines": {
-    "node": ">=18"
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "bunx eslint --fix .",
+    "*.{json,jsonc,md,yml,yaml,html}": "bunx eslint --fix ."
   },
-  "packageManager": "bun@1.3.4",
   "workspaces": [
     "apps/*",
     "packages/*"

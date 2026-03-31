@@ -8,6 +8,12 @@ run_step() {
   "$@" || exit 1
 }
 
+run_lint_staged() {
+  echo "🔍 Running lint-staged..."
+  cd "$ROOT" || exit 1
+  bunx lint-staged || exit 1
+}
+
 run_frontend_tests() {
   echo "🧪 Running frontend tests..."
   cd "$ROOT/apps/frontend" || exit 1
@@ -15,5 +21,6 @@ run_frontend_tests() {
   cd "$ROOT" || exit 1
 }
 
+run_lint_staged
 run_step "🔍 Running backend tests..." bun test "$ROOT/apps/backend/tests"
 run_frontend_tests
