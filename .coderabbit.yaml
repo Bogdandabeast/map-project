@@ -1,7 +1,7 @@
 # Configuración estricta de CodeRabbit para revisiones de PR
-language: "es-ES"
+language: es-ES
 reviews:
-  profile: "assertive" # Nivel estricto y asertivo para las revisiones
+  profile: assertive # Nivel estricto y asertivo para las revisiones
   high_level_summary: true
   poem: false
   # Instrucciones detalladas para el análisis del código
