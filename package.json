@@ -10,6 +10,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "husky": "^9.1.7",
     "prettier": "^3.7.4",
     "turbo": "^2.8.20",
