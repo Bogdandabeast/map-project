@@ -34,10 +34,7 @@ reviews:
       enabled: true
     eslint:
       enabled: true
-    prettier:
-      enabled: true
 
 # Chat con el bot
 chat:
-  enabled: true
   auto_reply: true

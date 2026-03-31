@@ -24,8 +24,8 @@
     "typescript": "^5.9.2"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": "bunx eslint --fix .",
-    "*.{json,jsonc,md,yml,yaml,html}": "bunx eslint --fix ."
+    "*.{ts,tsx,js,jsx}": "bunx eslint --fix",
+    "*.{json,jsonc,md,yml,yaml,html}": "bunx eslint --fix"
   },
   "workspaces": [
     "apps/*",

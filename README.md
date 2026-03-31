@@ -93,8 +93,8 @@ Este proyecto sigue rigurosamente la metodología TDD para asegurar la robustez 
 
 ### Ejecutar Tests
 
-- **Backend:** `bun test --filter backend`
-- **Frontend (Unitarios):** `bun run test.unit --filter apps-frontend`
+- **Backend:** `bun turbo run test --filter=backend` (o `cd apps/backend && bun test`)
+- **Frontend (Unitarios):** `bun turbo run test.unit --filter=apps-frontend` (o `cd apps/frontend && bun run test.unit`)
 
 ---
 
