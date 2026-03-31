@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'apps/frontend',
+  appId: 'io.bogdandabeast.mapproject',
+  appName: 'Map Project',
   webDir: 'dist',
 }
 
