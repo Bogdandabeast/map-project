@@ -176,8 +176,7 @@ docker ps -f name=postgres18_postgis
 ---
 
 ## 🗺️ OGC server (GeoServer)
-
-Geoserver expone un panel de control en [GeoServer](http://localhost:8080/geoserver/web/) donde poder crear los geo-servicios siguiendo los estándares del consorcio abierto geoespacial [OCG Consortium](https://www.ogc.org/es/)
+GeoServer expone un panel de control en [GeoServer](http://localhost:8080/geoserver/web/) donde poder crear los geo-servicios siguiendo los estándares del consorcio abierto geoespacial [OGC Consortium](https://www.ogc.org/es/)
 
 El servidor está configurado con las siguientes credenciales por defecto (modificar para producción):
 
