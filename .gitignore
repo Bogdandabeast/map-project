@@ -37,7 +37,7 @@ yarn-error.log*
 Thumbs.db
 
 # Bun
-bun.lockb
+# (bun.lock is tracked for deterministic installs)
 
 # Database
 *.db

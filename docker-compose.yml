@@ -6,9 +6,9 @@ services:
     container_name: postgres18_postgis
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-mydb}
     ports:
       - '5432:5432'
     volumes:
@@ -24,13 +24,13 @@ services:
     container_name: geoserver
     restart: unless-stopped
     environment:
-      GEOSERVER_ADMIN_USER: admin
-      GEOSERVER_ADMIN_PASSWORD: geoserver
+      GEOSERVER_ADMIN_USER: ${GEOSERVER_ADMIN_USER:-admin}
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD:-geoserver}
       HOST: db
       POSTGRES_PORT: 5432
-      POSTGRES_DB: mydb
-      POSTGRES_USER: postgres
-      POSTGRES_PASS: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-mydb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASS: ${POSTGRES_PASSWORD:-postgres}
       SAMPLE_DATA: 'false'
     ports:
       - '8080:8080'

@@ -1,7 +1,11 @@
 {
   "name": "backend",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "build": "tsc",
+    "lint": "eslint .",
+    "test": "bun test",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "hono": "^4.12.9"

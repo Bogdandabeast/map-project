@@ -26,7 +26,7 @@ Para ejecutar este proyecto, necesitas tener instalado:
     ```bash
     bun run dev
     ```
-    _Este comando levantará automáticamente el contenedor de PostGIS en segundo plano e iniciará tanto el frontend como el backend de forma paralela._
+    _Este comando ejecuta `docker compose up -d` para levantar el stack completo (PostGIS y GeoServer) e inicia tanto el frontend como el backend de forma paralela._
 
 ---
 
@@ -41,7 +41,7 @@ Para ejecutar este proyecto, necesitas tener instalado:
 ├── packages/
 │   ├── eslint-config/   # Configuraciones compartidas de ESLint
 │   └── typescript-config/ # Configuraciones compartidas de TypeScript
-├── docker-compose.yml   # Configuración de PostgreSQL + PostGIS
+├── docker-compose.yml   # Configuración de PostgreSQL + PostGIS y GeoServer
 └── turbo.json           # Configuración del pipeline de Turborepo
 ```
 
@@ -152,7 +152,9 @@ Turborepo gestiona las tareas de forma eficiente. Puedes filtrar qué aplicació
 
 Las tareas están definidas en `turbo.json`:
 
-- `build`: Depende de la construcción de sus dependencias internas (`^build`).
+- `build`: Compila todas las aplicaciones. Depende de la construcción de sus dependencias internas (`^build`).
+- `lint`: Ejecuta el linter en todos los paquetes. Depende de que las dependencias internas hayan sido linteadas primero (`^lint`).
+- `check-types`: Valida los tipos de TypeScript en todo el proyecto. Depende de las dependencias internas (`^check-types`).
 - `dev`: Tarea persistente que no usa cache, ideal para desarrollo local.
 
 ---
@@ -167,6 +169,8 @@ La base de datos está configurada con las siguientes credenciales por defecto (
 - **Contraseña:** `postgres`
 - **BD:** `mydb`
 
+> **Producción:** Nunca uses credenciales hardcodeadas. Configura las variables de entorno `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` (y `GEOSERVER_USER`, `GEOSERVER_PASS` para GeoServer) en un archivo `.env` (no commitear) o usa un gestor de secretos. Consulta `.env.example` para las claves requeridas.
+
 Para ver el estado de la base de datos:
 
 ```bash
@@ -176,7 +180,8 @@ docker ps -f name=postgres18_postgis
 ---
 
 ## 🗺️ OGC server (GeoServer)
-GeoServer expone un panel de control en [GeoServer](http://localhost:8080/geoserver/web/) donde poder crear los geo-servicios siguiendo los estándares del consorcio abierto geoespacial [OGC Consortium](https://www.ogc.org/es/)
+
+GeoServer expone un panel de control en [GeoServer](http://localhost:8080/geoserver/web/) donde poder crear los geo-servicios siguiendo los estándares del consorcio abierto geoespacial [OGC (Open Geospatial Consortium)](https://www.ogc.org/es/)
 
 El servidor está configurado con las siguientes credenciales por defecto (modificar para producción):
 
@@ -184,6 +189,8 @@ El servidor está configurado con las siguientes credenciales por defecto (modif
 - **Puerto:** `8080`
 - **Usuario:** `admin`
 - **Contraseña:** `geoserver`
+
+> **Producción:** Usa las variables `GEOSERVER_USER` y `GEOSERVER_PASS` definidas en tu `.env` o gestor de secretos.
 
 Para ver el estado del servidor:
 
