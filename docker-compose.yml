@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   db:
@@ -10,11 +10,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mydb
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [CMD-SHELL, pg_isready -U postgres]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -31,16 +31,16 @@ services:
       POSTGRES_DB: mydb
       POSTGRES_USER: postgres
       POSTGRES_PASS: postgres
-      SAMPLE_DATA: "false"
+      SAMPLE_DATA: 'false'
     ports:
-      - "8080:8080"
+      - '8080:8080'
     volumes:
       - geoserver_data:/opt/geoserver/data_dir
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/geoserver/web || exit 1"]
+      test: [CMD-SHELL, 'wget -q --spider http://localhost:8080/geoserver/web || exit 1']
       interval: 20s
       timeout: 5s
       retries: 5
