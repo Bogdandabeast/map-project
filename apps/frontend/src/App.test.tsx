@@ -1,8 +1,13 @@
 import { render } from '@testing-library/react'
-import React from 'react'
+import { expect, it, vi } from 'vitest'
 import App from './App'
 
+vi.mock('./components/map/view/MapView', () => ({
+  default: () => <div data-testid="map-mock" />,
+}))
+
 it('renders the app shell', () => {
-  const { container } = render(<App />)
-  expect(container.querySelector('ion-app')).toBeTruthy()
+  const { getByTestId } = render(<App />)
+
+  expect(getByTestId('map-mock')).toBeTruthy()
 })
