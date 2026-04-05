@@ -5,7 +5,7 @@
 import '@testing-library/jest-dom'
 
 // Mock matchmedia
-window.matchMedia = window.matchMedia || function () {
+globalThis.matchMedia = globalThis.matchMedia || function () {
   return {
     matches: false,
     addListener() {},

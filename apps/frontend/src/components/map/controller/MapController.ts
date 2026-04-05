@@ -27,7 +27,7 @@ export class MapController {
   constructor(
     private readonly model: IMapModel,
     private readonly params: MapControllerParams,
-  ) {}
+  ) { }
 
   /**
    * Creates the map instance (only once)
@@ -91,7 +91,6 @@ export class MapController {
     if (!this.map)
       return
 
-    this.map.setTarget(undefined)
     this.map = null
     this.view = null
     this.model.setMap(null)
@@ -111,9 +110,8 @@ export class MapController {
     const nextCenter = fromLonLat(center)
 
     if (
-      !currentCenter
-      || currentCenter[0] !== nextCenter[0]
-      || currentCenter[1] !== nextCenter[1]
+      currentCenter?.[0] !== nextCenter[0]
+      || currentCenter?.[1] !== nextCenter[1]
     ) {
       this.view.setCenter(nextCenter)
     }
