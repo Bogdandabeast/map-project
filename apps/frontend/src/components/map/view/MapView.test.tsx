@@ -2,24 +2,20 @@ import { render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MapView from './MapView'
 
-const mocks = vi.hoisted(() => {
-  return {
-    createMapMock: vi.fn(() => ({})),
-    destroyMock: vi.fn(),
-    syncFromModelMock: vi.fn(),
-    constructorMock: vi.fn(),
-  }
-})
+const createMapMock = vi.fn(() => ({}))
+const destroyMock = vi.fn()
+const syncFromModelMock = vi.fn()
+const controllerConstructorMock = vi.fn()
 
 vi.mock('../controller/MapController', () => {
   return {
     MapController: vi.fn().mockImplementation(() => {
-      mocks.constructorMock()
+      controllerConstructorMock()
 
       return {
-        createMap: mocks.createMapMock,
-        destroy: mocks.destroyMock,
-        syncFromModel: mocks.syncFromModelMock,
+        createMap: createMapMock,
+        destroy: destroyMock,
+        syncFromModel: syncFromModelMock,
       }
     }),
   }
@@ -36,31 +32,45 @@ describe('mapView', () => {
     vi.clearAllMocks()
   })
 
-  it('renderiza el contenedor del mapa', () => {
-    const { container } = render(<MapView />)
+  describe('rendering', () => {
+    it('should render the map container', () => {
+      const { container } = render(<MapView />)
 
-    const mapDiv = container.querySelector('.map-view')
-    expect(mapDiv).toBeTruthy()
+      expect(container.querySelector('.map-view')).toBeTruthy()
+    })
   })
 
-  it('crea el controlador y el mapa al montar', () => {
-    render(<MapView />)
+  describe('lifecycle', () => {
+    it('should create the controller on mount', () => {
+      render(<MapView />)
 
-    expect(mocks.constructorMock).toHaveBeenCalledTimes(1)
-    expect(mocks.createMapMock).toHaveBeenCalledTimes(1)
-  })
+      expect(controllerConstructorMock).toHaveBeenCalledTimes(1)
+    })
 
-  it('sincroniza el modelo tras el montaje', () => {
-    render(<MapView />)
+    it('should create the map on mount', () => {
+      render(<MapView />)
 
-    expect(mocks.syncFromModelMock).toHaveBeenCalled()
-  })
+      expect(createMapMock).toHaveBeenCalledTimes(1)
+    })
 
-  it('destruye el mapa al desmontar', () => {
-    const { unmount } = render(<MapView />)
+    it('should not synchronize the model more than once during initial mount', () => {
+      render(<MapView />)
 
-    unmount()
+      expect(syncFromModelMock).toHaveBeenCalledTimes(1)
+    })
 
-    expect(mocks.destroyMock).toHaveBeenCalledTimes(1)
+    it('should synchronize the model after mount', () => {
+      render(<MapView />)
+
+      expect(syncFromModelMock).toHaveBeenCalledTimes(1)
+    })
+
+    it('should destroy the map on unmount', () => {
+      const { unmount } = render(<MapView />)
+
+      unmount()
+
+      expect(destroyMock).toHaveBeenCalledTimes(1)
+    })
   })
 })
