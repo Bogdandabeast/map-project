@@ -4,10 +4,30 @@ import Map from 'ol/Map'
 import { fromLonLat, toLonLat } from 'ol/proj'
 import OSM from 'ol/source/OSM'
 import View from 'ol/View'
+// import TileWMS from 'ol/source'
+// import TileSource from 'ol/source/Tile'
 
 interface MapControllerParams {
   target: HTMLDivElement
 }
+
+export const COVERAGE_OSM = new TileLayer({
+  source: new OSM(),
+})
+
+/**
+const PNOA = new TileLayer({
+  source: new TileWMS({
+    url: 'https://www.ign.es/wms-inspire/pnoa-ma',
+    params: {
+      LAYERS: ['Fondo', 'OI.OrthoimageCoverage', 'OI.MosaicElement'],
+      TILED: true,
+    },
+    serverType: 'geoserver',
+    crossOrigin: 'anonymous',
+  }),
+})
+ */
 
 /**
  * MapController
@@ -46,9 +66,7 @@ export class MapController {
     })
 
     const layers = [
-      new TileLayer({
-        source: new OSM(),
-      }),
+      COVERAGE_OSM, // PNOA
     ]
 
     this.map = new Map({
