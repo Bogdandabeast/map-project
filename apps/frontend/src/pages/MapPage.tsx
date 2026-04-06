@@ -10,7 +10,7 @@ import './MapPage.css'
 export function MapPage() {
   return (
     <IonPage>
-      <IonContent fullscreen>
+      <IonContent fullscreen scrollY={false}>
         <div className="map-container">
           <MapView />
         </div>

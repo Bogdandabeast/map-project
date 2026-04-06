@@ -1,5 +1,6 @@
 import type { MapStore } from '../types/map.types'
 import { create } from 'zustand'
+import { EPSILON } from '../../../../utils/math'
 
 /**
  * Global map store (Zustand)
@@ -26,9 +27,8 @@ export const useMapStore = create<MapStore>(set => ({
   setCenter: center =>
     set((state) => {
       const sameCenter
-        = state.center[0] === center[0]
-          && state.center[1] === center[1]
-
+        = Math.abs(state.center[0] - center[0]) < EPSILON
+          && Math.abs(state.center[1] - center[1]) < EPSILON
       return sameCenter ? state : { center }
     }),
 
@@ -38,6 +38,6 @@ export const useMapStore = create<MapStore>(set => ({
    */
   setZoom: zoom =>
     set((state) => {
-      return state.zoom === zoom ? state : { zoom }
+      return Math.abs(state.zoom - zoom) < EPSILON ? state : { zoom }
     }),
 }))

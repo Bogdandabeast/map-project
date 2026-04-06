@@ -1,19 +1,18 @@
+import type { EventsKey } from 'ol/events'
 import type { IMapModel } from '../model/interfaces/IMapModel'
 import TileLayer from 'ol/layer/Tile'
 import Map from 'ol/Map'
+import { unByKey } from 'ol/Observable'
 import { fromLonLat, toLonLat } from 'ol/proj'
 import OSM from 'ol/source/OSM'
 import View from 'ol/View'
+
 // import TileWMS from 'ol/source'
 // import TileSource from 'ol/source/Tile'
 
 interface MapControllerParams {
   target: HTMLDivElement
 }
-
-export const COVERAGE_OSM = new TileLayer({
-  source: new OSM(),
-})
 
 /**
 const PNOA = new TileLayer({
@@ -38,6 +37,7 @@ const PNOA = new TileLayer({
 export class MapController {
   private map: Map | null = null
   private view: View | null = null
+  private moveEndEventKey: EventsKey | null = null
 
   /**
    * @param model Map model abstraction
@@ -65,6 +65,10 @@ export class MapController {
       zoom,
     })
 
+    const COVERAGE_OSM = new TileLayer({
+      source: new OSM(),
+    })
+
     const layers = [
       COVERAGE_OSM, // PNOA
     ]
@@ -88,7 +92,7 @@ export class MapController {
     if (!this.map || !this.view)
       return
 
-    this.map.on('moveend', () => {
+    this.moveEndEventKey = this.map.on('moveend', () => {
       const currentCenter = this.view?.getCenter()
       const currentZoom = this.view?.getZoom()
 
@@ -108,7 +112,13 @@ export class MapController {
   destroy() {
     if (!this.map)
       return
+    if (this.moveEndEventKey) {
+      unByKey(this.moveEndEventKey)
+      this.moveEndEventKey = null
+    }
 
+    this.map.setLayers([])
+    this.map.dispose()
     this.map = null
     this.view = null
     this.model.setMap(null)
