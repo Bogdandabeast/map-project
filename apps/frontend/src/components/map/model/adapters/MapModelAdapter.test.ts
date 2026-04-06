@@ -63,4 +63,55 @@ describe('mapModelAdapter', () => {
       expect(useMapStore.getState().map).toBeNull()
     })
   })
+  describe('edge Cases', () => {
+    it('should accept out-of-range coordinates (no validation at adapter level)', () => {
+      const invalidCenter: [number, number] = [200, 100] // invalid lon/lat
+
+      adapter.setCenter(invalidCenter)
+
+      expect(useMapStore.getState().center).toEqual(invalidCenter)
+    })
+
+    it('should accept negative zoom values', () => {
+      const negativeZoom = -5
+
+      adapter.setZoom(negativeZoom)
+
+      expect(useMapStore.getState().zoom).toBe(negativeZoom)
+    })
+
+    it('should accept extremely large zoom values', () => {
+      const hugeZoom = 9999
+
+      adapter.setZoom(hugeZoom)
+
+      expect(useMapStore.getState().zoom).toBe(hugeZoom)
+    })
+
+    it('should be idempotent when setting the same center twice', () => {
+      const center = adapter.getCenter()
+
+      const previousState = useMapStore.getState()
+
+      adapter.setCenter(center)
+      adapter.setCenter(center)
+
+      const nextState = useMapStore.getState()
+
+      expect(nextState).toBe(previousState)
+    })
+
+    it('should be idempotent when setting the same zoom twice', () => {
+      const zoom = adapter.getZoom()
+
+      const previousState = useMapStore.getState()
+
+      adapter.setZoom(zoom)
+      adapter.setZoom(zoom)
+
+      const nextState = useMapStore.getState()
+
+      expect(nextState).toBe(previousState)
+    })
+  })
 })
