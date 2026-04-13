@@ -12,7 +12,8 @@
       ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "*.ts", "*.tsx", "*.js", "*.jsx"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
