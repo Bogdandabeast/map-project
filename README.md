@@ -40,9 +40,59 @@ Para ejecutar este proyecto, necesitas tener instalado:
 │   └── docs/            # Documentación adicional
 ├── packages/
 │   ├── eslint-config/   # Configuraciones compartidas de ESLint
-│   └── typescript-config/ # Configuraciones compartidas de TypeScript
+│   ├── typescript-config/ # Configuraciones compartidas de TypeScript
+│   └── stoker/          # Utilidades para Hono y OpenAPI (códigos HTTP, middlewares, helpers)
 ├── docker-compose.yml   # Configuración de PostgreSQL + PostGIS y GeoServer
 └── turbo.json           # Configuración del pipeline de Turborepo
+```
+
+---
+
+## 📦 Paquetes Internos
+
+### @repo/stoker
+
+Un conjunto de utilidades optimizadas para **Hono** y **@hono/zod-openapi**. Proporciona una forma tipada y consistente de manejar respuestas HTTP y esquemas OpenAPI.
+
+#### Características principales:
+
+- **Códigos y Frases de Estado HTTP:** Constantes tipadas para evitar errores de escritura (ej. `HttpStatusCodes.OK`, `HttpStatusPhrases.NOT_FOUND`).
+- **Middlewares Estándar:**
+  - `notFound`: Manejador de rutas no encontradas con formato JSON consistente.
+  - `onError`: Manejador de errores global que oculta el stack trace en producción.
+  - `serveEmojiFavicon`: Middleware para servir un favicon basado en un emoji.
+- **OpenAPI Helpers:**
+  - `jsonContent`: Simplifica la definición de respuestas JSON en rutas OpenAPI.
+  - `jsonContentRequired`: Igual que el anterior, pero marcando el contenido como obligatorio.
+  - `defaultHook`: Un hook de validación que devuelve errores 422 de forma automática y formateada.
+
+#### Ejemplo de uso en el Backend:
+
+```typescript
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
+import { NOT_FOUND } from '@repo/stoker/http-status-codes'
+import * as middlewares from '@repo/stoker/middlewares'
+import { defaultHook } from '@repo/stoker/openapi'
+import { jsonContent } from '@repo/stoker/openapi/helpers'
+import { IdParamsSchema } from '@repo/stoker/openapi/schemas'
+
+const app = new OpenAPIHono({ defaultHook })
+
+// Middlewares globales
+app.notFound(middlewares.notFound)
+app.onError(middlewares.onError)
+
+const route = createRoute({
+  method: 'get',
+  path: '/users/{id}',
+  request: {
+    params: IdParamsSchema,
+  },
+  responses: {
+    200: jsonContent(UserSchema, 'El usuario solicitado'),
+    [NOT_FOUND]: jsonContent(ErrorSchema, 'Usuario no encontrado'),
+  },
+})
 ```
 
 ---

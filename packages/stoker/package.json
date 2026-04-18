@@ -1,0 +1,19 @@
+{
+  "name": "@repo/stoker",
+  "type": "module",
+  "version": "2.0.1",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./http-status-codes": "./src/http-status-codes.ts",
+    "./http-status-phrases": "./src/http-status-phrases.ts",
+    "./middlewares": "./src/middlewares/index.ts",
+    "./openapi": "./src/openapi/index.ts"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.1.0",
+    "@hono/zod-openapi": "^1.2.0",
+    "hono": "^4.6.0"
+  }
+}
