@@ -56,7 +56,7 @@ Un conjunto de utilidades optimizadas para **Hono** y **@hono/zod-openapi**. Pro
 
 #### Características principales:
 
-- **Códigos y Frases de Estado HTTP:** Constantes tipadas para evitar errores de escritura (ej. `HttpStatusCodes.OK`, `HttpStatusPhrases.NOT_FOUND`).
+- **Códigos y Frases de Estado HTTP:** Constantes tipadas para evitar errores de escritura (ej. `OK`, `NOT_FOUND`).
 - **Middlewares Estándar:**
   - `notFound`: Manejador de rutas no encontradas con formato JSON consistente.
   - `onError`: Manejador de errores global que oculta el stack trace en producción.
@@ -69,12 +69,21 @@ Un conjunto de utilidades optimizadas para **Hono** y **@hono/zod-openapi**. Pro
 #### Ejemplo de uso en el Backend:
 
 ```typescript
-import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
-import { NOT_FOUND } from '@repo/stoker/http-status-codes'
+import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
+import { NOT_FOUND, OK } from '@repo/stoker/http-status-codes'
 import * as middlewares from '@repo/stoker/middlewares'
 import { defaultHook } from '@repo/stoker/openapi'
 import { jsonContent } from '@repo/stoker/openapi/helpers'
 import { IdParamsSchema } from '@repo/stoker/openapi/schemas'
+
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+})
+
+const ErrorSchema = z.object({
+  message: z.string(),
+})
 
 const app = new OpenAPIHono({ defaultHook })
 
@@ -89,7 +98,7 @@ const route = createRoute({
     params: IdParamsSchema,
   },
   responses: {
-    200: jsonContent(UserSchema, 'El usuario solicitado'),
+    [OK]: jsonContent(UserSchema, 'El usuario solicitado'),
     [NOT_FOUND]: jsonContent(ErrorSchema, 'Usuario no encontrado'),
   },
 })
