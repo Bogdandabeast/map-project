@@ -1,11 +1,23 @@
+import type { ZodTypeAny } from 'zod'
 import { z } from '@hono/zod-openapi'
 
 type Validator = 'uuid' | 'nanoid' | 'cuid' | 'cuid2' | 'ulid'
 
-export interface ParamsSchema {
-  name?: string
-  validator?: Validator | undefined
+/**
+ * @deprecated Use Zod native validators directly if possible.
+ */
+const validatorsByName: Record<Validator, () => ZodTypeAny> = {
+  uuid: () => z.string().uuid(),
+  nanoid: () => z.string().nanoid(),
+  cuid: () => z.string().cuid(),
+  cuid2: () => z.string().cuid2(),
+  ulid: () => z.string().ulid(),
 }
+
+export type ParamsSchema = Partial<{
+  name: string
+  validator: Validator
+}>
 
 const examples: Record<Validator, string> = {
   uuid: '4651e634-a530-4484-9b09-9616a28f35e3',
@@ -18,15 +30,13 @@ const examples: Record<Validator, string> = {
 function getParamsSchema({
   name = 'id',
   validator = 'uuid',
-}: ParamsSchema) {
+}: ParamsSchema = {}) {
   return z.object({
-    [name]: z.string()[validator]().openapi({
+    [name]: validatorsByName[validator]().openapi({
       param: {
         name,
         in: 'path',
-        required: true,
       },
-      required: [name],
       example: examples[validator],
     }),
   })

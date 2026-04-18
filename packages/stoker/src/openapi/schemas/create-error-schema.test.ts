@@ -219,18 +219,18 @@ describe('create-error-schema', () => {
     })
     createErrorSchema(schema)
 
-    const metadata = [...zodToOpenAPIRegistry._map.values()][1]
+    const metadata = [...zodToOpenAPIRegistry._map.values()].find(m => m.example && Array.isArray(m.example.issues))
     expect(metadata).toBeDefined()
-    expect(metadata.example).toBeDefined()
+    expect(metadata!.example).toBeDefined()
 
-    const { example } = metadata
+    const { example } = metadata!
 
     expect(example).toHaveProperty('name')
     expect(example).toHaveProperty('issues')
     expect(Object.keys(example)).toHaveLength(2)
 
     expect(Array.isArray(example.issues)).toBe(true)
-    example.issues.forEach((issue: any) => {
+    example.issues.forEach((issue: z.ZodIssue) => {
       expect(issue).toHaveProperty('code')
       expect(issue).toHaveProperty('path')
       const expectedKeys = ['code', 'path']
@@ -246,18 +246,18 @@ describe('create-error-schema', () => {
     const schema = z.array(z.string())
     createErrorSchema(schema)
 
-    const metadata = [...zodToOpenAPIRegistry._map.values()][1]
+    const metadata = [...zodToOpenAPIRegistry._map.values()].find(m => m.example && Array.isArray(m.example.issues))
     expect(metadata).toBeDefined()
-    expect(metadata.example).toBeDefined()
+    expect(metadata!.example).toBeDefined()
 
-    const { example } = metadata
+    const { example } = metadata!
 
     expect(example).toHaveProperty('name')
     expect(example).toHaveProperty('issues')
     expect(Object.keys(example)).toHaveLength(2)
 
     expect(Array.isArray(example.issues)).toBe(true)
-    example.issues.forEach((issue: any) => {
+    example.issues.forEach((issue: z.ZodIssue) => {
       expect(issue).toHaveProperty('code')
       expect(issue).toHaveProperty('path')
       const expectedKeys = ['code', 'path']
