@@ -11,9 +11,15 @@
     "./middlewares": "./src/middlewares/index.ts",
     "./openapi": "./src/openapi/index.ts"
   },
+  "peerDependencies": {
+    "@hono/zod-openapi": "^1.3.0",
+    "hono": "^4.12.14"
+  },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.1.0",
-    "@hono/zod-openapi": "^1.2.0",
-    "hono": "^4.6.0"
+    "@asteasolutions/zod-to-openapi": "^8.1.0"
+  },
+  "devDependencies": {
+    "@hono/zod-openapi": "^1.3.0",
+    "hono": "^4.12.14"
   }
 }
