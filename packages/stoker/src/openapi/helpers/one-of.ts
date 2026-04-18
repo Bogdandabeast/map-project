@@ -8,6 +8,10 @@ import {
 function oneOf<
   T extends ZodSchema,
 >(schemas: T[]) {
+  if (schemas.length === 0) {
+    return []
+  }
+
   const registry = new OpenAPIRegistry()
 
   schemas.forEach((schema, index) => {
