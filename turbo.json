@@ -13,7 +13,7 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "inputs": ["$TURBO_DEFAULT$", "src/**", "*.ts", "*.tsx", "*.js", "*.jsx"]
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "*.ts", "*.tsx", "*.js", "*.jsx", "eslint.config.js"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
