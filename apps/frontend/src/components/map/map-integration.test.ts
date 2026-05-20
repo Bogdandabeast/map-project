@@ -75,17 +75,15 @@ describe('map Integration', () => {
     const map = controller.createMap()
 
     const view = (controller as any).view
-    const newCenter: [number, number] = [10, 20]
     const newZoom = 12
 
     view.setCenter([0, 0])
     view.setZoom(newZoom)
 
-    vi.mocked(proj.toLonLat).mockReturnValue(newCenter)
-
     map.trigger('moveend')
 
-    expect(useMapStore.getState().center).toEqual(newCenter)
+    expect(proj.toLonLat).toHaveBeenCalledWith([0, 0])
+    expect(useMapStore.getState().center).toEqual([0, 0])
     expect(useMapStore.getState().zoom).toBe(newZoom)
   })
 
@@ -110,10 +108,11 @@ describe('map Integration', () => {
     const view = (controller as any).view
 
     const moveCenter: [number, number] = [100, 100]
-    vi.mocked(proj.toLonLat).mockReturnValue(moveCenter)
+    view.setCenter(moveCenter)
 
     map.trigger('moveend')
-    expect(useMapStore.getState().center).toEqual(moveCenter)
+    expect(proj.toLonLat).toHaveBeenCalledWith(moveCenter)
+    expect(useMapStore.getState().center).toEqual(proj.toLonLat(moveCenter))
 
     const syncCenter: [number, number] = [200, 200]
     useMapStore.getState().setCenter(syncCenter)

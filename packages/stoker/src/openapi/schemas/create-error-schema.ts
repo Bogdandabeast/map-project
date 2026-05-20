@@ -28,7 +28,7 @@ function createErrorSchema<T extends ZodSchema>(schema: T) {
       }
 
   return z.object({
-    success: z.boolean().openapi({
+    success: z.literal(false).openapi({
       example: false,
     }),
     error: z

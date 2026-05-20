@@ -1,16 +1,13 @@
-import { OpenAPIHono } from '@hono/zod-openapi'
-import { notFound, onError } from '@repo/stoker/middlewares'
-import { defaultHook } from '@repo/stoker/openapi'
+import configureOpenAPI from '@/lib/configure-open-api'
+import createApp from '@/lib/create-app'
+import helloworld from '@/routes/helloworld.route'
+import index from '@/routes/index.route'
 
-const app = new OpenAPIHono({
-  defaultHook,
-})
+const app = createApp()
 
-app.notFound(notFound)
-app.onError(onError)
+configureOpenAPI(app)
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+app.route('/', index)
+app.route('/hello', helloworld)
 
 export default app

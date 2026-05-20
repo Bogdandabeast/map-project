@@ -9,7 +9,7 @@ function oneOf<
   T extends ZodSchema,
 >(schemas: T[]) {
   if (schemas.length === 0) {
-    return []
+    throw new Error('oneOf requires at least one schema')
   }
 
   const registry = new OpenAPIRegistry()

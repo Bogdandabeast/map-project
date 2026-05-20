@@ -4,8 +4,9 @@ import type { ContentfulStatusCode } from 'hono/utils/http-status'
 import { INTERNAL_SERVER_ERROR, OK } from '../http-status-codes.js'
 
 const onError: ErrorHandler = (err, c) => {
-  const currentStatus = 'status' in err && typeof err.status === 'number' && Number.isInteger(err.status) && err.status >= 400 && err.status <= 599
-    ? err.status
+  const errorObj = typeof err === 'object' && err !== null ? err : new Error(String(err))
+  const currentStatus = 'status' in errorObj && typeof errorObj.status === 'number' && Number.isInteger(errorObj.status) && errorObj.status >= 400 && errorObj.status <= 599
+    ? errorObj.status
     : c.newResponse(null).status
 
   /**
@@ -21,15 +22,15 @@ const onError: ErrorHandler = (err, c) => {
 
   // Log the error before returning the response
 
-  console.error(`[${c.req.method}] ${c.req.path} - ${statusCode}`, err)
+  console.error(`[${c.req.method}] ${c.req.path} - ${statusCode}`, errorObj)
 
   return c.json(
     {
-      message: err.message,
+      message: errorObj.message,
 
       stack: env === 'production'
         ? undefined
-        : err.stack,
+        : errorObj.stack,
     },
     statusCode,
   )

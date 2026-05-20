@@ -4,8 +4,14 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "moduleDetection": "force",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "strict": true
   }
 }

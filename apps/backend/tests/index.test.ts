@@ -3,10 +3,11 @@ import { describe, expect, test } from 'bun:test'
 import app from '../src/app'
 
 describe('Backend app', () => {
-  test('GET / returns 200 and hello message', async () => {
+  test('GET / returns 200 and Map API message', async () => {
     const res = await app.request('/')
     expect(res.status).toBe(200)
-    expect(await res.text()).toBe('Hello Hono!')
+    const json = await res.json()
+    expect(json.message).toBe('Map API')
   })
 
   test('GET /non-existent returns 404 from stoker notFound', async () => {
