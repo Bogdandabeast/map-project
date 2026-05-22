@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { notFound, onError } from '@repo/stoker/middlewares'
 import { defaultHook } from '@repo/stoker/openapi'
 import { auth } from './lib/auth'
+import { authMiddleware } from './middlewares/auth.js'
 
 const app = new OpenAPIHono({
   defaultHook,
@@ -10,16 +11,13 @@ const app = new OpenAPIHono({
 app.notFound(notFound)
 app.onError(onError)
 
-// Mount better-auth handler with debug logging
-app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
-  console.warn('--- AUTH DEBUG ---')
-  console.warn('URL:', c.req.url)
-  console.warn('Method:', c.req.method)
-  console.warn('Host:', c.req.header('Host'))
+// Mount better-auth handler
+app.on(['POST', 'GET'], '/api/auth/*', (c) => {
   return auth.handler(c.req.raw)
 })
 
-app.get('/api/protected', (c) => {
+// This route should be protected by the middleware the user will implement
+app.get('/api/protected', authMiddleware, (c) => {
   return c.text('protected route data')
 })
 
