@@ -38,6 +38,10 @@ Thumbs.db
 # Bun
 # (bun.lock is tracked for deterministic installs)
 
+# TypeScript build artifacts (no outDir)
+apps/backend/**/*.js
+apps/backend/**/*.js.map
+
 # Database
 *.db
 *.sqlite

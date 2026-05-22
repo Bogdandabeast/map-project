@@ -26,14 +26,14 @@ Chain strategy: pending
 ## Phase 1: Foundation
 
 - [ ] 1.1 Install `better-auth`, `drizzle-orm`, and `pg` in `apps/backend`.
-- [ ] 1.2 Create `apps/backend/src/db/schema.ts` defining `user`, `session`, and `account` tables compatible with `better-auth`.
+- [ ] 1.2 Create `apps/backend/src/db/schemas/schema.ts` defining `user`, `session`, and `account` tables compatible with `better-auth`.
 - [ ] 1.3 Create `apps/backend/src/lib/auth.ts` to initialize the `better-auth` instance using the Drizzle adapter.
 - [ ] 1.4 Create `apps/backend/src/types/auth.ts` to extend Hono's `Env` Variables with `user` and `session` types.
 
 ## Phase 2: Session Verification (TDD)
 
 - [ ] 2.1 (RED): Create `apps/backend/tests/auth-middleware.test.ts` with failing tests for `authMiddleware` (Valid session -> 200, Missing/Expired token -> 401).
-- [ ] 2.2 (GREEN): Implement `authMiddleware` in `apps/backend/src/middleware/auth.ts` using `auth.getSession(c.req.raw)`.
+- [ ] 2.2 (GREEN): Implement `authMiddleware` in `apps/backend/src/middlewares/auth.ts` using `auth.getSession(c.req.raw)`.
 - [ ] 2.3 (REFACTOR): Optimize `authMiddleware` types, removing all `any` and ensuring the injected `user` object is strictly typed.
 
 ## Phase 3: User Auth Flows (TDD)

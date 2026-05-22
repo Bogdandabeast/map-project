@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { validateConfig } from '../src/config'
-// Esto va a dar error porque el archivo no existe
+
 describe('Config Wrapper', () => {
   it('should throw an error if DATABASE_URL is missing', () => {
     // Simulamos un entorno donde falta la DATABASE_URL

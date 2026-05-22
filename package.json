@@ -13,11 +13,6 @@
     "check-types": "turbo run check-types",
     "prepare": "husky"
   },
-  "dependencies": {
-    "better-auth": "^1.6.11",
-    "drizzle-orm": "^0.45.2",
-    "pg": "^8.21.0"
-  },
   "devDependencies": {
     "@antfu/eslint-config": "^8.2.0",
     "@commitlint/cli": "^20.5.0",

@@ -67,12 +67,12 @@ Every auth feature will follow the Red-Green-Refactor cycle:
 
 ## Affected Areas
 
-| Area                     | Impact   | Description                               |
-| ------------------------ | -------- | ----------------------------------------- |
-| `src/db/schema.ts`       | New      | Auth tables (users, sessions, accounts)   |
-| `src/index.ts`           | Modified | Mounting `/api/auth` handler              |
-| `src/middleware/auth.ts` | New      | `authMiddleware` for session verification |
-| `src/types/auth.ts`      | New      | Hono context type augmentations           |
+| Area                       | Impact   | Description                               |
+| -------------------------- | -------- | ----------------------------------------- |
+| `src/db/schemas/schema.ts` | New      | Auth tables (users, sessions, accounts)   |
+| `src/app.ts`               | Modified | Mounting `/api/auth` handler              |
+| `src/middlewares/auth.ts`  | New      | `authMiddleware` for session verification |
+| `src/types/auth.ts`        | New      | Hono context type augmentations           |
 
 ## Risks
 
@@ -85,8 +85,8 @@ Every auth feature will follow the Red-Green-Refactor cycle:
 ## Rollback Plan
 
 1. Revert database migrations via `drizzle-kit drop`.
-2. Remove auth handler and middleware from `src/index.ts`.
-3. Remove `src/middleware/auth.ts` and `src/types/auth.ts`.
+2. Remove auth handler and middleware from `src/app.ts`.
+3. Remove `src/middlewares/auth.ts` and `src/types/auth.ts`.
 
 ## Dependencies
 

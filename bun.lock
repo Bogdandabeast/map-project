@@ -4,11 +4,6 @@
   "workspaces": {
     "": {
       "name": "my-monorepo",
-      "dependencies": {
-        "better-auth": "^1.6.11",
-        "drizzle-orm": "^0.45.2",
-        "pg": "^8.21.0",
-      },
       "devDependencies": {
         "@antfu/eslint-config": "^8.2.0",
         "@commitlint/cli": "^20.5.0",
@@ -30,7 +25,10 @@
       "dependencies": {
         "@hono/zod-openapi": "^1.3.0",
         "@repo/stoker": "workspace:*",
+        "better-auth": "^1.6.11",
+        "drizzle-orm": "^0.45.2",
         "hono": "^4.12.14",
+        "pg": "^8.21.0",
         "zod": "^4.4.3",
       },
       "devDependencies": {

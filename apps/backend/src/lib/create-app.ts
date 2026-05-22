@@ -1,7 +1,7 @@
-import type { OpenAPIHono } from '@hono/zod-openapi'
 import type { Schema } from 'hono'
-
 import type { AppOpenAPI } from './types'
+
+import { OpenAPIHono } from '@hono/zod-openapi'
 import { notFound, onError, serveEmojiFavicon } from '@repo/stoker/middlewares'
 import { defaultHook } from '@repo/stoker/openapi'
 

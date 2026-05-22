@@ -7,7 +7,7 @@ The backend is a minimal Hono application using `@hono/zod-openapi`. It currentl
 ### Affected Areas
 
 - `apps/backend/src/app.ts` — Needs to mount the `better-auth` handler and apply auth middleware to protected routes.
-- `apps/backend/src/auth.ts` (New) — Configuration for the `better-auth` instance.
+- `apps/backend/src/lib/auth.ts` (New) — Configuration for the `better-auth` instance.
 - `apps/backend/src/middlewares/auth.ts` (New) — Middleware to verify sessions and inject user context.
 - `apps/backend/package.json` — Addition of `better-auth` and database-related dependencies.
 - Root/Backend `.env` — New environment variables for `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`.
