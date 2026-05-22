@@ -2,22 +2,20 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { authClient } from '../../lib/auth-client'
 import { AuthLayout } from './AuthLayout'
 
-vi.mock('../../lib/auth-client', () => {
-  const mockUseSession = vi.fn()
-  ;(globalThis as unknown as Record<string, unknown>).__mockLayoutUseSession = mockUseSession
-  return {
-    authClient: {
-      useSession: mockUseSession,
-    },
-  }
-})
+vi.mock('../../lib/auth-client', () => ({
+  authClient: {
+    useSession: vi.fn(),
+  },
+}))
+
+const mockUseSession = vi.mocked(authClient.useSession)
 
 beforeEach(() => {
   vi.clearAllMocks()
-  const mock = (globalThis as unknown as Record<string, unknown>).__mockLayoutUseSession as ReturnType<typeof vi.fn>
-  mock.mockReturnValue({ data: null, isPending: false })
+  mockUseSession.mockReturnValue({ data: null, isPending: false })
 })
 
 function renderLayout(content = 'Child Content') {

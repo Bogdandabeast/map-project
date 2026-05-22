@@ -1,11 +1,13 @@
+import process from 'node:process'
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { notFound, onError } from '@repo/stoker/middlewares'
 import { defaultHook } from '@repo/stoker/openapi'
+import { pool } from './db'
 import { auth } from './lib/auth'
 import { authMiddleware } from './middlewares/auth.js'
 import { validateAuth } from './middlewares/validate.js'
 
-const app = new OpenAPIHono({
+export const app = new OpenAPIHono({
   defaultHook,
 })
 
@@ -34,4 +36,32 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-export default app
+console.warn('ENV:', {
+  BUN_TEST: process.env.BUN_TEST,
+  NODE_ENV: process.env.NODE_ENV,
+})
+export const server = Bun.serve({
+  port: process.env.BUN_TEST || process.env.NODE_ENV === 'test' ? 0 : 3000,
+  fetch: app.fetch,
+})
+
+export async function gracefulShutdown(signal: string) {
+  console.warn(`Received ${signal}. Shutting down gracefully...`)
+
+  try {
+    await server.stop()
+    console.warn('HTTP server stopped')
+
+    await pool.end()
+    console.warn('DB pool closed')
+
+    process.exit(0)
+  }
+  catch (err) {
+    console.error('Error during graceful shutdown:', err)
+    process.exit(1)
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT', () => gracefulShutdown('SIGINT'))

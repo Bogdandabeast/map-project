@@ -26,7 +26,7 @@ export async function validateAuth(c: Context, next: Next) {
 
   let body: unknown
   try {
-    body = await c.req.json()
+    body = await c.req.raw.clone().json()
   }
   catch {
     return c.json({ error: 'Invalid JSON body', fields: {} }, 400)

@@ -18,8 +18,15 @@ export function AuthHeader() {
   const { data: session } = authClient.useSession()
 
   async function handleSignOut() {
-    await authClient.signOut()
-    window.location.href = '/login'
+    try {
+      await authClient.signOut()
+    }
+    catch (error) {
+      console.error('Sign out failed:', error)
+    }
+    finally {
+      window.location.href = '/login'
+    }
   }
 
   return (

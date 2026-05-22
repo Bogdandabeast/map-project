@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProtectedRoute } from './ProtectedRoute'
 
@@ -61,5 +61,19 @@ describe('protectedRoute', () => {
     renderProtected()
     expect(screen.getByTestId('protected-content')).toBeInTheDocument()
     expect(screen.getByTestId('protected-content')).toHaveTextContent('Secret Map')
+  })
+
+  it('renders error state when useSession returns an error', () => {
+    const useSession = (globalThis as unknown as Record<string, unknown>).__mockUseSession as ReturnType<typeof vi.fn>
+    useSession.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      error: { message: 'Session check failed' },
+    })
+
+    renderProtected()
+    expect(screen.getByText('Authentication Error')).toBeInTheDocument()
+    expect(screen.getByText('Session check failed')).toBeInTheDocument()
+    expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument()
   })
 })

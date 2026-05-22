@@ -1,23 +1,21 @@
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { authClient } from '../lib/auth-client'
 import { LoginPage } from './LoginPage'
 
-vi.mock('../lib/auth-client', () => {
-  const signIn = vi.fn()
-  const useSession = vi.fn(() => ({ data: null, isPending: false }))
-  ;(globalThis as unknown as Record<string, unknown>).__mockSignIn = signIn
-  ;(globalThis as unknown as Record<string, unknown>).__mockLoginUseSession = useSession
-  return {
-    authClient: {
-      signIn: {
-        email: signIn,
-      },
-      useSession,
+vi.mock('../lib/auth-client', () => ({
+  authClient: {
+    signIn: {
+      email: vi.fn(),
     },
-  }
-})
+    useSession: vi.fn(() => ({ data: null, isPending: false })),
+  },
+}))
+
+const mockSignIn = vi.mocked(authClient.signIn.email)
+const mockUseSession = vi.mocked(authClient.useSession)
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -67,7 +65,7 @@ describe('loginPage', () => {
 
   it('shows validation errors and does not call API when email is invalid', async () => {
     renderLogin()
-    const signIn = (globalThis as unknown as Record<string, unknown>).__mockSignIn as ReturnType<typeof vi.fn>
+    const signIn = mockSignIn as ReturnType<typeof vi.fn>
 
     await setIonInputValue('ion-input[label="Email"]', 'not-an-email')
     await setIonInputValue('ion-input[label="Password"]', '12345678')
@@ -79,7 +77,7 @@ describe('loginPage', () => {
 
   it('shows validation errors when password is too short', async () => {
     renderLogin()
-    const signIn = (globalThis as unknown as Record<string, unknown>).__mockSignIn as ReturnType<typeof vi.fn>
+    const signIn = mockSignIn as ReturnType<typeof vi.fn>
 
     await setIonInputValue('ion-input[label="Email"]', 'user@example.com')
     await setIonInputValue('ion-input[label="Password"]', '123')
@@ -91,7 +89,7 @@ describe('loginPage', () => {
 
   it('calls authClient.signIn.email() with valid data', async () => {
     renderLogin()
-    const signIn = (globalThis as unknown as Record<string, unknown>).__mockSignIn as ReturnType<typeof vi.fn>
+    const signIn = mockSignIn as ReturnType<typeof vi.fn>
     signIn.mockResolvedValue({ data: { user: { email: 'test@example.com' } } })
 
     await setIonInputValue('ion-input[label="Email"]', 'user@example.com')
@@ -106,7 +104,7 @@ describe('loginPage', () => {
 
   it('shows error message when credentials are invalid', async () => {
     renderLogin()
-    const signIn = (globalThis as unknown as Record<string, unknown>).__mockSignIn as ReturnType<typeof vi.fn>
+    const signIn = mockSignIn as ReturnType<typeof vi.fn>
     signIn.mockRejectedValue(new Error('Invalid credentials'))
 
     await setIonInputValue('ion-input[label="Email"]', 'user@example.com')
@@ -117,7 +115,7 @@ describe('loginPage', () => {
   })
 
   it('redirects to /map when already authenticated', () => {
-    const useSession = (globalThis as unknown as Record<string, unknown>).__mockLoginUseSession as ReturnType<typeof vi.fn>
+    const useSession = mockUseSession as ReturnType<typeof vi.fn>
     useSession.mockReturnValue({
       data: {
         user: { id: '1', email: 'test@example.com' },
