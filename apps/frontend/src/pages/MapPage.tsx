@@ -1,4 +1,4 @@
-import { IonContent, IonPage } from '@ionic/react'
+import { AuthLayout } from '../components/auth/AuthLayout'
 import MapView from '../components/map/view/MapView'
 import './MapPage.css'
 
@@ -9,12 +9,10 @@ import './MapPage.css'
  */
 export function MapPage() {
   return (
-    <IonPage>
-      <IonContent fullscreen scrollY={false}>
-        <div className="map-container">
-          <MapView />
-        </div>
-      </IonContent>
-    </IonPage>
+    <AuthLayout fullscreen scrollY={false}>
+      <div className="map-container">
+        <MapView />
+      </div>
+    </AuthLayout>
   )
 }
