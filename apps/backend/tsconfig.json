@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
+    "target": "ES2022",
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
+    "moduleDetection": "force",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true
   }
 }

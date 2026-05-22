@@ -13,19 +13,20 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^7.7.3",
+    "@antfu/eslint-config": "^8.2.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@repo/eslint-config": "workspace:*",
     "eslint": "^9.39.1",
+    "eslint-plugin-format": "^2.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "turbo": "^2.8.20",
     "typescript": "^5.9.2"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": "bunx eslint --fix",
-    "*.{json,jsonc,md,yml,yaml,html}": "bunx eslint --fix"
+    "*.{ts,tsx,js,jsx}": "bun eslint --fix",
+    "*.{json,jsonc,md,yml,yaml,html}": "bun eslint --fix"
   },
   "workspaces": [
     "apps/*",
