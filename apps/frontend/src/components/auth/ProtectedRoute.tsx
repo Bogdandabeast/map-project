@@ -21,11 +21,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (error) {
+    console.error('[ProtectedRoute] Session check failed:', error)
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
         <IonText color="danger">
           <h2>Authentication Error</h2>
-          <p>{error.message || 'An unexpected error occurred while checking your session.'}</p>
+          <p>An unexpected error occurred while checking your session.</p>
         </IonText>
       </div>
     )

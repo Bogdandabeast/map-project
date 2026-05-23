@@ -73,7 +73,7 @@ describe('protectedRoute', () => {
 
     renderProtected()
     expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('Session check failed')).toBeInTheDocument()
+    expect(screen.getByText('An unexpected error occurred while checking your session.')).toBeInTheDocument()
     expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument()
   })
 })

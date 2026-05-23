@@ -13,6 +13,9 @@ const envSchema = z.object({
         .filter(o => o.length > 0),
     ),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  DB_POOL_MAX: z.coerce.number().default(10),
+  DB_POOL_IDLE_TIMEOUT: z.coerce.number().default(30000),
+  DB_POOL_CONNECTION_TIMEOUT: z.coerce.number().default(5000),
 })
 
 export function validateConfig(env: unknown) {

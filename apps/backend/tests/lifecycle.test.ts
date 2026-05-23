@@ -4,14 +4,19 @@ import { pool } from '../src/db'
 
 describe('Lifecycle', () => {
   it('should close server and pool during graceful shutdown', async () => {
-    const stopSpy = vi.spyOn(server, 'stop')
-    const endSpy = vi.spyOn(pool, 'end')
+    const stopSpy = vi.spyOn(server, 'stop').mockImplementation(() => Promise.resolve())
+    const endSpy = vi.spyOn(pool, 'end').mockImplementation(() => Promise.resolve())
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)
 
-    await gracefulShutdown('SIGTERM')
+    try {
+      await gracefulShutdown('SIGTERM')
 
-    expect(stopSpy).toHaveBeenCalled()
-    expect(endSpy).toHaveBeenCalled()
-    expect(exitSpy).toHaveBeenCalledWith(0)
+      expect(stopSpy).toHaveBeenCalled()
+      expect(endSpy).toHaveBeenCalled()
+      expect(exitSpy).toHaveBeenCalledWith(0)
+    }
+    finally {
+      vi.restoreAllMocks()
+    }
   })
 })
