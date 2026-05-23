@@ -1,6 +1,6 @@
 import * as HttpStatusPhrases from '@repo/stoker/http-status-phrases'
 import { describe, expect, test } from 'bun:test'
-import app from '../src/app'
+import { app } from '../src/app'
 
 describe('Backend app', () => {
   test('GET / returns 200 and hello message', async () => {

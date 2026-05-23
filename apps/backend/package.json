@@ -11,8 +11,12 @@
   "dependencies": {
     "@hono/zod-openapi": "^1.3.0",
     "@repo/stoker": "workspace:*",
+    "@repo/validations": "workspace:*",
+    "better-auth": "^1.6.11",
+    "drizzle-orm": "^0.45.2",
     "hono": "^4.12.14",
-    "zod": "^4.3.6"
+    "pg": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

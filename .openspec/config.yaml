@@ -1,0 +1,31 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Bun, Turbo, TypeScript, Hono, React, Ionic, Capacitor, Vite, Zustand, OpenLayers, Zod-OpenAPI
+  Architecture: Monorepo (apps/backend, apps/frontend, packages/stoker)
+  Testing: Bun test (backend), Vitest (frontend unit), Cypress (frontend e2e)
+  Style: Conventional Commits, ESLint (@antfu/eslint-config)
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    rules:
+      - Follow existing code patterns
+    tdd: true
+    test_command: bun test
+  verify:
+    test_command: bun test
+    build_command: turbo run build
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas

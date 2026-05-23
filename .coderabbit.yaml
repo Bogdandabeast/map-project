@@ -35,6 +35,11 @@ reviews:
     eslint:
       enabled: true
 
+  path_filters:
+    - '!*'
+    - 'apps/**'
+    - 'packages/**'
+
 # Chat con el bot
 chat:
   auto_reply: true
