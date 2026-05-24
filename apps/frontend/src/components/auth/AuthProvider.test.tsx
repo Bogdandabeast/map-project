@@ -27,7 +27,9 @@ describe('authProvider', () => {
       </AuthProvider>,
     )
 
-    const loading = container.querySelector('ion-loading')
+    // IonLoading renders inside a <template> (Ionic overlay optimization)
+    const template = container.querySelector('template')
+    const loading = template?.content?.querySelector('ion-loading')
     expect(loading).not.toBeNull()
     expect(loading?.getAttribute('is-open')).toBe('true')
   })

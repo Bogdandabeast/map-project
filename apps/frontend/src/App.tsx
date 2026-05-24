@@ -24,7 +24,15 @@ import './theme/variables.css'
 
 setupIonicReact()
 
-const App: React.FC = () => (
+interface AppProps {
+  /**
+   * Override the map page content (for testing).
+   * Defaults to `<MapPage />`.
+   */
+  mapContent?: React.ReactNode
+}
+
+const App: React.FC<AppProps> = ({ mapContent }) => (
   <IonApp>
     <IonReactRouter>
       <AuthProvider>
@@ -34,7 +42,7 @@ const App: React.FC = () => (
             <Route exact path="/signup" component={SignupPage} />
             <Route exact path="/map">
               <ProtectedRoute>
-                <MapPage />
+                {mapContent ?? <MapPage />}
               </ProtectedRoute>
             </Route>
             <Route exact path="/">

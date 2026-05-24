@@ -33,7 +33,9 @@ describe('protectedRoute', () => {
     useSession.mockReturnValue({ data: undefined, isPending: true })
 
     const { container } = renderProtected()
-    const loading = container.querySelector('ion-loading')
+    // IonLoading renders inside a <template> (Ionic overlay optimization)
+    const template = container.querySelector('template')
+    const loading = template?.content?.querySelector('ion-loading')
     expect(loading?.getAttribute('is-open')).toBe('true')
   })
 

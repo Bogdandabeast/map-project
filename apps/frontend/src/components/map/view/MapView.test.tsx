@@ -6,25 +6,21 @@ const destroyMock = vi.fn()
 const syncFromModelMock = vi.fn()
 const controllerConstructorMock = vi.fn()
 
-vi.mock('../controller/MapController', () => {
-  return {
-    MapController: vi.fn().mockImplementation(() => {
-      controllerConstructorMock()
-
-      return {
-        createMap: createMapMock,
-        destroy: destroyMock,
-        syncFromModel: syncFromModelMock,
-      }
-    }),
-  }
-})
-
-vi.mock('../model/adapters/MapModelAdapter', () => {
-  return {
-    MapModelAdapter: vi.fn().mockImplementation(() => ({})),
-  }
-})
+function renderMapView() {
+  return render(
+    <MapView
+      createModel={() => ({}) as any}
+      createController={() => {
+        controllerConstructorMock()
+        return {
+          createMap: createMapMock,
+          destroy: destroyMock,
+          syncFromModel: syncFromModelMock,
+        }
+      }}
+    />,
+  )
+}
 
 describe('mapView', () => {
   beforeEach(() => {
@@ -33,7 +29,7 @@ describe('mapView', () => {
 
   describe('rendering', () => {
     it('should render the map container', () => {
-      const { container } = render(<MapView />)
+      const { container } = renderMapView()
 
       expect(container.querySelector('.map-view')).toBeTruthy()
     })
@@ -41,31 +37,31 @@ describe('mapView', () => {
 
   describe('lifecycle', () => {
     it('should create the controller on mount', () => {
-      render(<MapView />)
+      renderMapView()
 
       expect(controllerConstructorMock).toHaveBeenCalledTimes(1)
     })
 
     it('should create the map on mount', () => {
-      render(<MapView />)
+      renderMapView()
 
       expect(createMapMock).toHaveBeenCalledTimes(1)
     })
 
     it('should not synchronize the model more than once during initial mount', () => {
-      render(<MapView />)
+      renderMapView()
 
       expect(syncFromModelMock).toHaveBeenCalledTimes(1)
     })
 
     it('should synchronize the model after mount', () => {
-      render(<MapView />)
+      renderMapView()
 
       expect(syncFromModelMock).toHaveBeenCalledTimes(1)
     })
 
     it('should destroy the map on unmount', () => {
-      const { unmount } = render(<MapView />)
+      const { unmount } = renderMapView()
 
       unmount()
 

@@ -1,18 +1,34 @@
 import { useEffect, useRef } from 'react'
-import { MapController } from '../controller/MapController'
-import { MapModelAdapter } from '../model/adapters/MapModelAdapter'
+import type { MapController } from '../controller/MapController'
+import type { MapModelAdapter } from '../model/adapters/MapModelAdapter'
 import { useMapStore } from '../model/stores/mapStore'
 import 'ol/ol.css'
 import './MapView.css'
+
+type ModelFactory = () => MapModelAdapter
+type ControllerFactory = (
+  model: MapModelAdapter,
+  options: { target: HTMLElement },
+) => MapController
+
+interface MapViewDeps {
+  createModel?: ModelFactory
+  createController?: ControllerFactory
+}
 
 /**
  * MapView component
  * Initializes and renders the map inside a container.
  * It creates the map controller once and keeps it in sync
  * with the store state (center and zoom).
+ *
+ * Accepts optional factory functions for testing — when omitted
+ * the real MapModelAdapter and MapController are loaded dynamically.
+ *
  * @returns {JSX.Element}
  */
-export default function MapView() {
+export default function MapView(deps: MapViewDeps = {}) {
+  const { createModel, createController } = deps
   const containerRef = useRef<HTMLDivElement | null>(null)
   const controllerRef = useRef<MapController | null>(null)
 
@@ -23,20 +39,28 @@ export default function MapView() {
     if (!containerRef.current || controllerRef.current)
       return
 
-    const model = new MapModelAdapter()
+    async function init() {
+      const model = createModel
+        ? createModel()
+        : new (await import('../model/adapters/MapModelAdapter')).MapModelAdapter()
 
-    const controller = new MapController(model, {
-      target: containerRef.current,
-    })
+      const controller = createController
+        ? createController(model, { target: containerRef.current! })
+        : new (await import('../controller/MapController')).MapController(model, {
+            target: containerRef.current!,
+          })
 
-    controller.createMap()
-    controllerRef.current = controller
+      controller.createMap()
+      controllerRef.current = controller
+    }
+
+    init()
 
     return () => {
-      controller.destroy()
+      controllerRef.current?.destroy()
       controllerRef.current = null
     }
-  }, [])
+  }, [createModel, createController])
 
   useEffect(() => {
     controllerRef.current?.syncFromModel()
