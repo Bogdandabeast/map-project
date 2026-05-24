@@ -1,10 +1,9 @@
+import type { FC, ReactNode } from 'react'
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import { type FC, type ReactNode } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import { AuthProvider } from './components/auth/AuthProvider'
-import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { MapPage } from './pages/MapPage'
 import { SignupPage } from './pages/SignupPage'
@@ -42,9 +41,7 @@ const App: FC<AppProps> = ({ mapContent }) => (
             <Route exact path="/login" component={LoginPage} />
             <Route exact path="/signup" component={SignupPage} />
             <Route exact path="/map">
-              <ProtectedRoute>
-                {mapContent ?? <MapPage />}
-              </ProtectedRoute>
+              {mapContent ?? <MapPage />}
             </Route>
             <Route exact path="/">
               <Redirect to="/map" />
