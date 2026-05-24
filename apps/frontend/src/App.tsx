@@ -1,5 +1,6 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
+import { type FC, type ReactNode } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 
 import { AuthProvider } from './components/auth/AuthProvider'
@@ -29,10 +30,10 @@ interface AppProps {
    * Override the map page content (for testing).
    * Defaults to `<MapPage />`.
    */
-  mapContent?: React.ReactNode
+  mapContent?: ReactNode
 }
 
-const App: React.FC<AppProps> = ({ mapContent }) => (
+const App: FC<AppProps> = ({ mapContent }) => (
   <IonApp>
     <IonReactRouter>
       <AuthProvider>

@@ -39,16 +39,25 @@ export default function MapView(deps: MapViewDeps = {}) {
     if (!containerRef.current || controllerRef.current)
       return
 
+    let mounted = true
+
     async function init() {
       const model = createModel
         ? createModel()
         : new (await import('../model/adapters/MapModelAdapter')).MapModelAdapter()
+
+      if (!mounted) return
 
       const controller = createController
         ? createController(model, { target: containerRef.current! })
         : new (await import('../controller/MapController')).MapController(model, {
             target: containerRef.current!,
           })
+
+      if (!mounted) {
+        controller.destroy()
+        return
+      }
 
       controller.createMap()
       controllerRef.current = controller
@@ -57,6 +66,7 @@ export default function MapView(deps: MapViewDeps = {}) {
     init()
 
     return () => {
+      mounted = false
       controllerRef.current?.destroy()
       controllerRef.current = null
     }
