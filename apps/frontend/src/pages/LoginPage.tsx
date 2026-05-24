@@ -1,10 +1,10 @@
 import { IonButton, IonInput, IonItem, IonText } from '@ionic/react'
 import { signInSchema } from '@repo/validations'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { AuthLayout } from '../components/auth/AuthLayout'
-import { authClient } from '../lib/auth-client'
 import { useMachine } from '../hooks/useMachine'
+import { authClient } from '../lib/auth-client'
 import { authFormMachine } from './authFormMachine'
 
 /**
@@ -17,9 +17,13 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [state, send] = useMachine(authFormMachine)
+  const isSubmittingRef = useRef(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (isSubmittingRef.current)
+      return
+
     send({ type: 'SUBMIT' })
 
     const result = signInSchema.safeParse({ email, password })
@@ -28,6 +32,7 @@ export function LoginPage() {
       return
     }
 
+    isSubmittingRef.current = true
     send({ type: 'VALIDATION_PASSED' })
     try {
       await authClient.signIn.email(result.data)
@@ -35,6 +40,9 @@ export function LoginPage() {
     }
     catch (err) {
       send({ type: 'API_FAILED', error: err instanceof Error ? err.message : 'Sign in failed' })
+    }
+    finally {
+      isSubmittingRef.current = false
     }
   }
 
@@ -57,9 +65,10 @@ export function LoginPage() {
               labelPlacement="stacked"
               type="email"
               value={email}
-              onIonInput={e => {
+              onIonInput={(e) => {
                 setEmail(e.detail.value ?? '')
-                if (state.type === 'ERROR') send({ type: 'RESET' })
+                if (state.type === 'ERROR')
+                  send({ type: 'RESET' })
               }}
               className={errors.email ? 'ion-invalid' : ''}
               fill="outline"
@@ -77,9 +86,10 @@ export function LoginPage() {
               labelPlacement="stacked"
               type="password"
               value={password}
-              onIonInput={e => {
+              onIonInput={(e) => {
                 setPassword(e.detail.value ?? '')
-                if (state.type === 'ERROR') send({ type: 'RESET' })
+                if (state.type === 'ERROR')
+                  send({ type: 'RESET' })
               }}
               className={errors.password ? 'ion-invalid' : ''}
               fill="outline"

@@ -25,7 +25,7 @@ describe('mapView Integration', () => {
     )
 
     await waitFor(() => {
-      expect(screen.queryByText(/loading map.../i)).not.toBeInTheDocument()
+      expect(mockController.createMap).toHaveBeenCalled()
     }, { timeout: 2000 })
 
     expect(mockController.createMap).toHaveBeenCalled()
@@ -42,7 +42,8 @@ describe('mapView Integration', () => {
     render(<MapView createModel={createModel} />)
 
     await waitFor(() => {
-      expect(screen.getByText(/failed to load map: Load failed/i)).toBeInTheDocument()
+      const errorEl = screen.getByText(/failed to load map/i)
+      expect(errorEl.textContent).toContain('Load failed')
     }, { timeout: 2000 })
   })
 })

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-describe('useMachine Reducer Logic', () => {
+/**
+ * This file is a template/example showing how to implement and test a reducer
+ * for use with the `useMachine` hook.
+ *
+ * See `useMachine.ts` for the hook implementation and `MachineConfig` for the configuration type.
+ * The `config.reducer` should be a pure function that determines the next state based on the current state and an event.
+ */
+describe('useMachine Reducer Example', () => {
   type State = { type: 'IDLE' } | { type: 'ACTIVE' }
   type Event = { type: 'ACTIVATE' } | { type: 'DEACTIVATE' }
 

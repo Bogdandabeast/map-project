@@ -14,9 +14,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, send] = useMachine(sessionMachine)
 
   useEffect(() => {
+    let mounted = true
+
     authClient
       .getSession()
       .then((session) => {
+        if (!mounted)
+          return
         send({
           type: 'SESSION_RESOLVED',
           success: !!session,
@@ -24,8 +28,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
       })
       .catch(() => {
+        if (!mounted)
+          return
         send({ type: 'SESSION_RESOLVED', success: false })
       })
+
+    return () => {
+      mounted = false
+    }
   }, [send])
 
   const isLoading = state.type === 'INITIALIZING'
