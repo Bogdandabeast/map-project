@@ -123,15 +123,15 @@ pnpm add @repo/ui --filter=web
 
 ```bash
 # syncpack - Check and fix version mismatches
-npx syncpack list-mismatches
-npx syncpack fix-mismatches
+bunx syncpack list-mismatches
+bunx syncpack fix-mismatches
 
 # manypkg - Similar functionality
-npx @manypkg/cli check
-npx @manypkg/cli fix
+bunx @manypkg/cli check
+bunx @manypkg/cli fix
 
 # sherif - Rust-based, very fast
-npx sherif
+bunx sherif
 ```
 
 ### Option 2: Package Manager Commands

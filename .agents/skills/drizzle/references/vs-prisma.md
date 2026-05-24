@@ -205,7 +205,7 @@ const usersWithPosts = await prisma.user.findMany({
 **Drizzle** (SQL-based):
 ```bash
 # Generate migration
-npx drizzle-kit generate
+bunx drizzle-kit generate
 
 # Output: drizzle/0000_migration.sql
 # CREATE TABLE "users" (
@@ -214,13 +214,13 @@ npx drizzle-kit generate
 # );
 
 # Apply migration
-npx drizzle-kit migrate
+bunx drizzle-kit migrate
 ```
 
 **Prisma** (Declarative):
 ```bash
 # Generate and apply migration
-npx prisma migrate dev --name add_users
+bunx prisma migrate dev --name add_users
 
 # Prisma compares schema.prisma to database
 # Generates SQL automatically
@@ -242,7 +242,7 @@ const user: User = await db.select().from(users);
 **Prisma** (Generated):
 ```typescript
 // Types generated after schema change
-// Run: npx prisma generate
+// Run: bunx prisma generate
 
 import { User, Post } from '@prisma/client';
 
@@ -348,7 +348,7 @@ export default {
 
 ```bash
 # Generate Drizzle schema from existing database
-npx drizzle-kit introspect
+bunx drizzle-kit introspect
 ```
 
 ### Step 3: Convert Queries

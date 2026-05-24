@@ -63,7 +63,7 @@ None — no spec-level requirements change.
 2. Restore vitest deps and scripts in package.json files.
 3. Revert `vite.config.ts` test blocks, restore deleted configs.
 4. Remove `bunfig.toml` `[test]` section.
-5. Verify tests pass with `npx vitest run` in each affected package.
+5. Verify tests pass with `bunx vitest run` in each affected package.
 
 ## Success Criteria
 

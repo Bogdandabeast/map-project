@@ -1,11 +1,11 @@
 ---
 name: hono
-description: Use when building Hono web applications or when the user asks about Hono APIs, routing, middleware, JSX, validation, testing, or streaming. TRIGGER when code imports from 'hono' or 'hono/*', or user mentions Hono. Use `npx hono request` to test endpoints.
+description: Use when building Hono web applications or when the user asks about Hono APIs, routing, middleware, JSX, validation, testing, or streaming. TRIGGER when code imports from 'hono' or 'hono/*', or user mentions Hono. Use `bunx hono request` to test endpoints.
 ---
 
 # Hono Skill
 
-Build Hono web applications. This skill provides inline API knowledge for AI. Use `npx hono request` to test endpoints. If the `hono-docs` MCP server is configured, prefer its tools for the latest documentation over the inline reference.
+Build Hono web applications. This skill provides inline API knowledge for AI. Use `bunx hono request` to test endpoints. If the `hono-docs` MCP server is configured, prefer its tools for the latest documentation over the inline reference.
 
 ## Hono CLI Usage
 
@@ -15,17 +15,17 @@ Test endpoints without starting an HTTP server. Uses `app.request()` internally.
 
 ```bash
 # GET request
-npx hono request [file] -P /path
+bunx hono request [file] -P /path
 
 # POST request with JSON body
-npx hono request [file] -X POST -P /api/users -d '{"name": "test"}'
+bunx hono request [file] -X POST -P /api/users -d '{"name": "test"}'
 ```
 
 **Note:** Do not pass credentials directly in CLI arguments. Use environment variables for sensitive values. `hono request` does not support Cloudflare Workers bindings (KV, D1, R2, etc.). When bindings are required, use `workers-fetch` instead:
 
 ```bash
-npx workers-fetch /path
-npx workers-fetch -X POST -H "Content-Type:application/json" -d '{"name":"test"}' /api/users
+bunx workers-fetch /path
+bunx workers-fetch -X POST -H "Content-Type:application/json" -d '{"name":"test"}' /api/users
 ```
 
 ---
@@ -372,7 +372,7 @@ app.get('/', (c) => {
 
 ### jsxRenderer Middleware
 
-Use `jsxRenderer` middleware for layouts. See `npx hono docs /docs/middleware/builtin/jsx-renderer` for details.
+Use `jsxRenderer` middleware for layouts. See `bunx hono docs /docs/middleware/builtin/jsx-renderer` for details.
 
 ### Async Components
 
@@ -529,7 +529,7 @@ import { upgradeWebSocket } from 'hono/cloudflare-workers' // or other adapter
 
 Available helpers: Accepts, Adapter, ConnInfo, Cookie, css, Dev, Factory, html, JWT, Proxy, Route, SSG, Streaming, Testing, WebSocket.
 
-For details, use `npx hono docs /docs/helpers/<helper-name>`.
+For details, use `bunx hono docs /docs/helpers/<helper-name>`.
 
 ### Factory
 

@@ -321,19 +321,19 @@ export default {
 
 ```bash
 # Generate migration
-npx drizzle-kit generate
+bunx drizzle-kit generate
 
 # View SQL
 cat drizzle/0000_migration.sql
 
 # Apply migration
-npx drizzle-kit migrate
+bunx drizzle-kit migrate
 
 # Introspect existing database
-npx drizzle-kit introspect
+bunx drizzle-kit introspect
 
 # Drizzle Studio (database GUI)
-npx drizzle-kit studio
+bunx drizzle-kit studio
 ```
 
 ### Example Migration
