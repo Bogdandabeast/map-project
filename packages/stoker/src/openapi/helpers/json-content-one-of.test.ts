@@ -1,6 +1,5 @@
 /* eslint-disable ts/ban-ts-comment */
 import { z } from '@hono/zod-openapi'
-import { describe, expect, it } from 'vitest'
 
 import jsonContentOneOf from './json-content-one-of.js'
 

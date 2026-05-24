@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
-import { describe, expect, it } from 'vitest'
 
 import * as HttpStatusCodes from '../http-status-codes.js'
 import defaultHook from './default-hook.js'

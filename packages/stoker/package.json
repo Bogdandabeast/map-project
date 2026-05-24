@@ -11,6 +11,9 @@
     "./middlewares": "./src/middlewares/index.ts",
     "./openapi": "./src/openapi/index.ts"
   },
+  "scripts": {
+    "test": "bun test"
+  },
   "peerDependencies": {
     "@hono/zod-openapi": "^1.3.0",
     "hono": "^4.12.14"
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "@hono/zod-openapi": "^1.3.0",
+    "@types/bun": "^1.3.14",
     "hono": "^4.12.14"
   }
 }

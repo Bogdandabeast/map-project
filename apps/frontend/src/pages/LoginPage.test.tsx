@@ -1,6 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { authClient } from '../lib/auth-client'
 import { LoginPage } from './LoginPage'
@@ -14,8 +13,8 @@ vi.mock('../lib/auth-client', () => ({
   },
 }))
 
-const mockSignIn = vi.mocked(authClient.signIn.email)
-const mockUseSession = vi.mocked(authClient.useSession)
+const mockSignIn = authClient.signIn.email as ReturnType<typeof vi.fn>
+const mockUseSession = authClient.useSession as ReturnType<typeof vi.fn>
 
 beforeEach(() => {
   vi.clearAllMocks()

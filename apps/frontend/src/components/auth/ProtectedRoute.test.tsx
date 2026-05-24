@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProtectedRoute } from './ProtectedRoute'
 
@@ -34,8 +33,10 @@ describe('protectedRoute', () => {
     useSession.mockReturnValue({ data: undefined, isPending: true })
 
     const { container } = renderProtected()
-    const loading = container.querySelector('ion-loading')
-    expect(loading).toHaveAttribute('is-open', 'true')
+    // IonLoading renders inside a <template> (Ionic overlay optimization)
+    const template = container.querySelector('template')
+    const loading = template?.content?.querySelector('ion-loading')
+    expect(loading?.getAttribute('is-open')).toBe('true')
   })
 
   it('redirects to /login when no session', () => {

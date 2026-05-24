@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import onError from './on-error.js'
 

@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AuthProvider } from './AuthProvider'
 
@@ -28,9 +27,11 @@ describe('authProvider', () => {
       </AuthProvider>,
     )
 
-    const loading = container.querySelector('ion-loading')
-    expect(loading).toBeInTheDocument()
-    expect(loading).toHaveAttribute('is-open', 'true')
+    // IonLoading renders inside a <template> (Ionic overlay optimization)
+    const template = container.querySelector('template')
+    const loading = template?.content?.querySelector('ion-loading')
+    expect(loading).not.toBeNull()
+    expect(loading?.getAttribute('is-open')).toBe('true')
   })
 
   it('renders children when session check resolves', async () => {
