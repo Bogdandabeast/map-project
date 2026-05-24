@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
 import type { MapController } from '../controller/MapController'
 import type { MapModelAdapter } from '../model/adapters/MapModelAdapter'
+import { useEffect, useRef } from 'react'
+import { useMachine } from '../../../hooks/useMachine'
 import { useMapStore } from '../model/stores/mapStore'
+import { mapInitMachine } from './mapInitMachine'
 import 'ol/ol.css'
 import './MapView.css'
 
@@ -30,53 +32,102 @@ interface MapViewDeps {
 export default function MapView(deps: MapViewDeps = {}) {
   const { createModel, createController } = deps
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const controllerRef = useRef<MapController | null>(null)
+  const [state, send] = useMachine(mapInitMachine)
 
   const center = useMapStore(state => state.center)
   const zoom = useMapStore(state => state.zoom)
 
+  // Trigger initial load
   useEffect(() => {
-    if (!containerRef.current || controllerRef.current)
+    send({ type: 'START_INIT' })
+  }, [])
+
+  // Handle Asset Loading
+  useEffect(() => {
+    if (state.type !== 'LOADING_ASSETS')
       return
 
-    let mounted = true
-
-    async function init() {
-      const model = createModel
-        ? createModel()
-        : new (await import('../model/adapters/MapModelAdapter')).MapModelAdapter()
-
-      if (!mounted) return
-
-      const controller = createController
-        ? createController(model, { target: containerRef.current! })
-        : new (await import('../controller/MapController')).MapController(model, {
-            target: containerRef.current!,
-          })
-
-      if (!mounted) {
-        controller.destroy()
-        return
+    async function loadAssets() {
+      try {
+        if (!createModel) {
+          await import('../model/adapters/MapModelAdapter')
+        }
+        if (!createController) {
+          await import('../controller/MapController')
+        }
+        send({ type: 'ASSETS_LOADED' })
       }
-
-      controller.createMap()
-      controllerRef.current = controller
+      catch (e) {
+        send({ type: 'INIT_FAILED', error: (e as Error).message })
+      }
     }
 
-    init()
+    loadAssets()
+  }, [state.type, createModel, createController])
+
+  // Handle Instantiation
+  useEffect(() => {
+    if (state.type !== 'INSTANTIATING' || !containerRef.current)
+      return
+
+    async function instantiate() {
+      try {
+        const model = createModel
+          ? createModel()
+          : new (await import('../model/adapters/MapModelAdapter')).MapModelAdapter()
+
+        const controller = createController
+          ? createController(model, { target: containerRef.current! })
+          : new (await import('../controller/MapController')).MapController(model, {
+              target: containerRef.current!,
+            })
+
+        send({ type: 'CONTROLLER_READY', controller })
+      }
+      catch (e) {
+        send({ type: 'INIT_FAILED', error: (e as Error).message })
+      }
+    }
+
+    instantiate()
+  }, [state.type, createModel, createController])
+
+  // Handle Map Creation (READY state)
+  useEffect(() => {
+    if (state.type !== 'READY')
+      return
+
+    state.controller.createMap()
 
     return () => {
-      mounted = false
-      controllerRef.current?.destroy()
-      controllerRef.current = null
+      state.controller.destroy()
     }
-  }, [createModel, createController])
+  }, [state])
 
   useEffect(() => {
-    controllerRef.current?.syncFromModel()
-  }, [center, zoom])
+    if (state.type === 'READY') {
+      state.controller.syncFromModel()
+    }
+  }, [center, zoom, state])
+
+  if (state.type === 'ERROR') {
+    return (
+      <div className="map-view error">
+        <p>
+          Failed to load map:
+          {state.error}
+        </p>
+      </div>
+    )
+  }
 
   return (
-    <div className="map-view" ref={containerRef} />
+    <div className="map-view" ref={containerRef}>
+      {state.type !== 'READY' && (
+        <div className="map-view-overlay loading">
+          <p>Loading map...</p>
+        </div>
+      )}
+    </div>
   )
 }
