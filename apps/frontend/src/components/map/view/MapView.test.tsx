@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MapView from './MapView'
 
 const createMapMock = vi.fn(() => ({}))

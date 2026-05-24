@@ -1,15 +1,14 @@
 import type { IMapModel } from '../model/interfaces/IMapModel'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MapController } from './MapController'
 
 beforeAll(() => {
   class ResizeObserverMock {
-    observe = vi.fn()
-    unobserve = vi.fn()
-    disconnect = vi.fn()
+    observe = () => {}
+    unobserve = () => {}
+    disconnect = () => {}
   }
 
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+  globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
 })
 
 describe('mapController', () => {

@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { expect, it, vi } from 'vitest'
 import App from './App'
 
 vi.mock('./components/map/view/MapView', () => ({

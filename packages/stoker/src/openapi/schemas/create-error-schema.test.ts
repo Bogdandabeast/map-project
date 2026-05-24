@@ -1,7 +1,6 @@
 // we are using zodToOpenAPIRegistry to retrieve the example from the schemas
 import { zodToOpenAPIRegistry } from '@asteasolutions/zod-to-openapi'
 import { z } from '@hono/zod-openapi'
-import { describe, expect, it } from 'vitest'
 
 import createErrorSchema from './create-error-schema.js'
 

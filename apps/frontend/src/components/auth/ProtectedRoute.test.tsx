@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ProtectedRoute } from './ProtectedRoute'
 
@@ -35,7 +34,7 @@ describe('protectedRoute', () => {
 
     const { container } = renderProtected()
     const loading = container.querySelector('ion-loading')
-    expect(loading).toHaveAttribute('is-open', 'true')
+    expect(loading?.getAttribute('is-open')).toBe('true')
   })
 
   it('redirects to /login when no session', () => {
