@@ -1,0 +1,36 @@
+# Apply Progress: cqrs-implementation
+
+## Mode: Standard
+
+## Completed Tasks
+- [x] 5.1 Refactor `apps/backend/src/routes/maps.ts`: integrate `zValidator` and `createMapHandler` for `POST /maps`.
+- [x] 5.2 Refactor `apps/backend/src/routes/maps.ts`: integrate `getMapByIdHandler` for `GET /maps/:id`.
+- [x] 5.3 Refactor `apps/backend/src/routes/maps.ts`: integrate `getMarkersInBoundsHandler` for `GET /maps/:id/markers`.
+- [x] 6.1 Unit tests for handlers verified (via existing module tests).
+- [x] 6.2 Spatial query integration tests verified (via existing module tests).
+- [x] 6.3 Created E2E tests in `apps/backend/src/tests/api/maps.test.ts`.
+
+## Files Changed
+| File | Action | What Was Done |
+|------|--------|---------------|
+| `apps/backend/src/routes/maps.ts` | Created | Implemented thin handlers for Map and Marker operations. |
+| `apps/backend/src/app.ts` | Modified | Mounted `mapsRoutes` at `/api/maps`. |
+| `apps/backend/src/modules/maps/dtos/requests.ts` | Modified | Added `GetMarkersBoundsSchema`. |
+| `apps/backend/src/modules/maps/commands/create-map.handler.ts` | Modified | Added `randomUUID()` for ID generation. |
+| `apps/backend/src/tests/api/maps.test.ts` | Created | Full-stack integration tests for maps API. |
+| `apps/backend/src/db/index.ts` | Modified | Included `mapsSchema` in the drizzle constructor. |
+| `apps/backend/drizzle.config.ts` | Modified | Included `maps/schema.ts` in the config. |
+
+## Deviations from Design
+- None.
+
+## Issues Found
+- Missing `@hono/zod-validator` dependency (installed).
+- Database tables were not created in the test environment (fixed via manual setup script and config update).
+- `createMapHandler` was missing ID generation (fixed).
+
+## Workload / PR Boundary
+- Mode: chained PR slice
+- Current work unit: Routing & Integration
+- Boundary: Phase 5 and Phase 6
+- Estimated review budget impact: Low (Thin handlers, clear routing)
