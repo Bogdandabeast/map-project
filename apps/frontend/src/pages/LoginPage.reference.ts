@@ -13,7 +13,6 @@
 export type AuthStatus
   = | 'IDLE' // Reposo: El usuario está escribiendo o acaba de entrar.
     | 'VALIDATING' // Validando: Estamos chequeando con Zod que los datos sean correctos.
-    | 'SUBMITTING' // Enviando: La petición ya salió hacia el servidor.
     | 'ERROR' // Error: Algo falló (ya sea la validación o la API).
     | 'SUCCESS' // Éxito: El usuario entró, estamos redirigiendo.
 
@@ -77,6 +76,7 @@ export function authReducer(state: AuthState, action: AuthAction): AuthState {
       return {
         ...state,
         status: 'SUCCESS',
+        error: null,
       }
 
     case 'LOGIN_FAIL':

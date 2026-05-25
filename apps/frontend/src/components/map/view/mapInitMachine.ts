@@ -41,6 +41,9 @@ export function mapInitReducer(state: MapInitState, event: MapInitEvent): MapIni
       return state
 
     case 'ERROR':
+      if (event.type === 'START_INIT') {
+        return { type: 'LOADING_ASSETS' }
+      }
       return state
 
     default:

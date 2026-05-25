@@ -57,4 +57,6 @@ CREATE TABLE "markers" (
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "markers" ADD CONSTRAINT "markers_mapId_maps_id_fk" FOREIGN KEY ("mapId") REFERENCES "public"."maps"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "markers" ADD CONSTRAINT "markers_mapId_maps_id_fk" FOREIGN KEY ("mapId") REFERENCES "public"."maps"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "markers_mapId_idx" ON "markers"("mapId");--> statement-breakpoint
+CREATE INDEX "markers_mapId_lat_lng_idx" ON "markers"("mapId","lat","lng");

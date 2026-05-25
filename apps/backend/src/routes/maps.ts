@@ -42,6 +42,8 @@ maps.patch('/markers/:id', zValidator('json', UpdateMarkerSchema), async (c) => 
   const data = c.req.valid('json')
 
   const result = await updateMarkerHandler({ id, ...data })
+  if (!result)
+    return c.json({ error: 'Marker not found' }, 404)
   return c.json(result)
 })
 

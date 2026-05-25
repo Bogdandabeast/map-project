@@ -47,6 +47,8 @@ export default function MapView(deps: MapViewDeps = {}) {
     if (state.type !== 'LOADING_ASSETS')
       return
 
+    let mounted = true
+
     async function loadAssets() {
       try {
         if (!createModel) {
@@ -55,14 +57,22 @@ export default function MapView(deps: MapViewDeps = {}) {
         if (!createController) {
           await import('../controller/MapController')
         }
-        send({ type: 'ASSETS_LOADED' })
+        if (mounted) {
+          send({ type: 'ASSETS_LOADED' })
+        }
       }
       catch (e) {
-        send({ type: 'INIT_FAILED', error: (e as Error).message })
+        if (mounted) {
+          send({ type: 'INIT_FAILED', error: (e as Error).message })
+        }
       }
     }
 
     loadAssets()
+
+    return () => {
+      mounted = false
+    }
   }, [state.type, createModel, createController])
 
   // Handle Instantiation
@@ -70,11 +80,16 @@ export default function MapView(deps: MapViewDeps = {}) {
     if (state.type !== 'INSTANTIATING' || !containerRef.current)
       return
 
+    let mounted = true
+
     async function instantiate() {
       try {
         const model = createModel
           ? createModel()
           : new (await import('../model/adapters/MapModelAdapter')).MapModelAdapter()
+
+        if (!mounted)
+          return
 
         const controller = createController
           ? createController(model, { target: containerRef.current! })
@@ -82,14 +97,22 @@ export default function MapView(deps: MapViewDeps = {}) {
               target: containerRef.current!,
             })
 
-        send({ type: 'CONTROLLER_READY', controller })
+        if (mounted) {
+          send({ type: 'CONTROLLER_READY', controller })
+        }
       }
       catch (e) {
-        send({ type: 'INIT_FAILED', error: (e as Error).message })
+        if (mounted) {
+          send({ type: 'INIT_FAILED', error: (e as Error).message })
+        }
       }
     }
 
     instantiate()
+
+    return () => {
+      mounted = false
+    }
   }, [state.type, createModel, createController])
 
   // Handle Map Creation (READY state)

@@ -7,12 +7,13 @@ import { markers } from '../schema'
 export const updateMarkerHandler: CommandHandler<{ id: string } & UpdateMarkerRequest, boolean> = async (data) => {
   const { id, ...updateData } = data
 
-  await db.update(markers)
+  const [updated] = await db.update(markers)
     .set({
       ...updateData,
       updatedAt: new Date(),
     })
     .where(eq(markers.id, id))
+    .returning({ id: markers.id })
 
-  return true
+  return !!updated
 }
