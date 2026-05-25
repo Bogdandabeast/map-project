@@ -1,7 +1,9 @@
 import { IonLoading } from '@ionic/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useMachine } from '../../hooks/useMachine'
 import { authClient } from '../../lib/auth-client'
 import { AuthContext } from './auth-context'
+import { sessionMachine } from './sessionMachine'
 
 /**
  * Provides the auth session loading state to the entire app.
@@ -9,18 +11,34 @@ import { AuthContext } from './auth-context'
  * Shows an IonLoading spinner while the check is in progress.
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(true)
+  const [state, send] = useMachine(sessionMachine)
 
   useEffect(() => {
+    let mounted = true
+
     authClient
       .getSession()
-      .then(() => {
-        setIsLoading(false)
+      .then((session) => {
+        if (!mounted)
+          return
+        send({
+          type: 'SESSION_RESOLVED',
+          success: !!session,
+          session,
+        })
       })
       .catch(() => {
-        setIsLoading(false)
+        if (!mounted)
+          return
+        send({ type: 'SESSION_RESOLVED', success: false })
       })
-  }, [])
+
+    return () => {
+      mounted = false
+    }
+  }, [send])
+
+  const isLoading = state.type === 'INITIALIZING'
 
   return (
     <AuthContext.Provider value={{ isLoading }}>

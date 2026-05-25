@@ -6,6 +6,7 @@ import { pool } from './db'
 import { auth } from './lib/auth'
 import { authMiddleware } from './middlewares/auth.js'
 import { validateAuth } from './middlewares/validate.js'
+import mapsRoutes from './routes/maps'
 
 export const app = new OpenAPIHono({
   defaultHook,
@@ -26,6 +27,8 @@ app.on(['POST'], '/api/auth/sign-up/email', validateAuth, (c) => {
 app.on(['POST', 'GET'], '/api/auth/*', (c) => {
   return auth.handler(c.req.raw)
 })
+
+app.route('/api/maps', mapsRoutes)
 
 // This route should be protected by the middleware the user will implement
 app.get('/api/protected', authMiddleware, (c) => {

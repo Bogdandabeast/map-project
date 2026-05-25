@@ -1,0 +1,57 @@
+# Verification Report: FSM Refactor
+
+## Change Summary
+Refactored authentication session, map initialization, and auth form flows from implicit state (booleans) to explicit Finite State Machines (FSMs).
+
+## Verification Mode
+Standard Verification (Pure Reducer Tests + Source Inspection + Regression Suite)
+
+## Completeness
+| Task | Status | Evidence |
+|------|--------|-----------|
+| `useMachine` utility | ✅ Complete | `useMachine.ts`, `useMachine.test.ts` |
+| Session Machine | ✅ Complete | `sessionMachine.ts`, `AuthProvider.tsx`, `sessionMachine.test.ts` |
+| Map Init Machine | ✅ Complete | `mapInitMachine.ts`, `MapView.tsx`, `mapInitMachine.test.ts` |
+| Auth Form Machine | ✅ Complete | `authFormMachine.ts`, `LoginPage.tsx`, `SignupPage.tsx`, `authFormMachine.test.ts` |
+| UI Integration | ✅ Complete | Source inspection of `AuthProvider`, `MapView`, `LoginPage`, `SignupPage` |
+
+## Build & Test Evidence
+- **Unit Tests**: `bun test` (apps/frontend) $\rightarrow$ 88 pass, 0 fail.
+- **Reducer Tests**: All 3 FSM reducers passed their respective unit tests.
+- **Regression**: Full frontend test suite passed.
+
+## Spec Compliance Matrix
+
+### Session FSM
+| Requirement | Status | Evidence |
+|--------------|--------|-----------|
+| `INITIALIZING` $\rightarrow$ `AUTHENTICATED` | ✅ PASS | `sessionReducer`: `SESSION_RESOLVED(true)` |
+| `INITIALIZING` $\rightarrow$ `UNAUTHENTICATED` | ✅ PASS | `sessionReducer`: `SESSION_RESOLVED(false)` |
+| No flicker during init | ✅ PASS | `AuthProvider`: `IonLoading` shown during `INITIALIZING` |
+
+### Map Init FSM
+| Requirement | Status | Evidence |
+|--------------|--------|-----------|
+| `UNINITIALIZED` $\rightarrow$ `LOADING_ASSETS` | ✅ PASS | `mapInitReducer`: `START_INIT` |
+| `LOADING_ASSETS` $\rightarrow$ `INSTANTIATING` | ✅ PASS | `mapInitReducer`: `ASSETS_LOADED` |
+| `INSTANTIATING` $\rightarrow$ `READY` | ✅ PASS | `mapInitReducer`: `CONTROLLER_READY` |
+| `ANY` $\rightarrow$ `ERROR` | ✅ PASS | `mapInitReducer`: `INIT_FAILED` handled at top level |
+| Map rendered only when `READY` | ✅ PASS | `MapView`: `useEffect` checks `state.type === 'READY'` |
+
+### Auth Form FSM
+| Requirement | Status | Evidence |
+|--------------|--------|-----------|
+| `IDLE` $\rightarrow$ `VALIDATING` $\rightarrow$ `SUBMITTING` | ✅ PASS | `authFormReducer`: `SUBMIT` $\rightarrow$ `VALIDATION_PASSED` |
+| Validation Failure $\rightarrow$ `ERROR` | ✅ PASS | `authFormReducer`: `VALIDATION_FAILED` |
+| API Failure $\rightarrow$ `ERROR` | ✅ PASS | `authFormReducer`: `API_FAILED` |
+| Button disabled during submission | ✅ PASS | `LoginPage`/`SignupPage`: `disabled={isSubmitting}` |
+
+## Design Coherence
+The implementation strictly follows the decision to use a custom `useMachine` hook and pure reducers with discriminated unions. The code is highly type-safe and predictable.
+
+## Findings
+
+### SUGGESTION
+In `LoginPage.tsx` and `SignupPage.tsx`, the submit button is only disabled when `state.type === 'SUBMITTING'`. While Zod validation is synchronous and fast, it is better practice to also disable the button during the `VALIDATING` state for consistency.
+
+## Final Verdict: PASS

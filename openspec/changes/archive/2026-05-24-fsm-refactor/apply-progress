@@ -1,0 +1,51 @@
+# Apply Progress: FSM Refactor
+
+**Mode**: Strict TDD
+**Status**: Phase 4 Complete
+
+## TDD Cycle Evidence
+
+| Task | Test File | Layer | Safety Net | RED | GREEN | TRIANGULATE | REFACTOR |
+|------|-----------|-------|------------|-----|-------|-------------|----------|
+| 1.1/1.2 | `apps/frontend/src/hooks/useMachine.test.ts` & `useMachine.reducer.test.ts` | Unit | N/A (new) | ✅ Written | ✅ Passed | ✅ 7 cases | ✅ Clean |
+| 2.1/2.3 | `apps/frontend/src/components/auth/sessionMachine.test.ts` | Unit | N/A (new) | ✅ Written | ✅ Passed | ✅ 4 cases | ✅ Clean |
+| 4.1/4.4 | `apps/frontend/src/pages/authFormMachine.test.ts` | Unit | N/A (new) | ✅ Written | ✅ Passed | ✅ 8 cases | ✅ Clean |
+
+## Implementation Details
+
+### Completed Tasks
+- [x] 1.1 Create `apps/frontend/src/hooks/useMachine.ts` implementing the generic `useMachine` hook and `MachineConfig` types.
+- [x] 1.2 Implement unit tests for `useMachine` to verify state updates and event dispatching.
+- [x] 2.1 Create `apps/frontend/src/components/auth/sessionMachine.ts` defining `SessionState`, `SessionEvent`, and the pure `sessionReducer`.
+- [x] 2.2 Refactor `apps/frontend/src/components/auth/AuthProvider.tsx` to use `useMachine(sessionMachine)`, replacing implicit booleans and `useState` calls.
+- [x] 2.3 Write unit tests for `sessionReducer` verifying transitions for `SESSION_RESOLVED`.
+- [x] 4.1 Create `apps/frontend/src/pages/authFormMachine.ts` defining `AuthFormState`, `AuthFormEvent`, and the pure `authFormReducer`.
+- [x] 4.2 Refactor `apps/frontend/src/pages/LoginPage.tsx` to use `useMachine(authFormMachine)` for validation and submission.
+- [x] 4.3 Refactor `apps/frontend/src/pages/SignupPage.tsx` to use `useMachine(authFormMachine)` for validation and submission.
+- [x] 4.4 Write unit tests for `authFormReducer` verifying `SUBMIT` $\rightarrow$ `VALIDATION_FAILED` / `API_SUCCESS` flows.
+
+### Files Changed
+| File | Action | What Was Done |
+|------|--------|---------------|
+| `apps/frontend/src/hooks/useMachine.ts` | Created | Implemented generic `useMachine` hook using `useReducer`. |
+| `apps/frontend/src/hooks/useMachine.test.ts` | Created | Added hook integration tests verifying state transitions. |
+| `apps/frontend/src/hooks/useMachine.reducer.test.ts` | Created | Added pure unit tests for the machine reducer logic. |
+| `apps/frontend/src/components/auth/sessionMachine.ts` | Created | Defined session FSM states, events, and reducer. |
+| `apps/frontend/src/components/auth/sessionMachine.test.ts` | Created | Pure unit tests for sessionReducer. |
+| `apps/frontend/src/components/auth/AuthProvider.tsx` | Modified | Integrated useMachine to manage auth session state. |
+| `apps/frontend/src/pages/authFormMachine.ts` | Created | Defined auth form FSM for validation and submission flows. |
+| `apps/frontend/src/pages/authFormMachine.test.ts` | Created | Unit tests for authFormReducer verifying transition matrix. |
+| `apps/frontend/src/pages/LoginPage.tsx` | Modified | Replaced implicit state with authFormMachine. |
+| `apps/frontend/src/pages/SignupPage.tsx` | Modified | Replaced implicit state with authFormMachine. |
+
+### Deviations from Design
+None — implementation matches design.
+
+### Issues Found
+- Discovered that `bun test` requires `--dom` flag or a specific DOM environment setup to run `@testing-library/react` tests from the root directory. Running tests from `apps/frontend` resolved this.
+
+### Workload / PR Boundary
+- Mode: chained PR slice
+- Current work unit: Auth Form Machine Integration
+- Boundary: Task 4.1 to 4.4
+- Estimated review budget impact: Low (~200 lines)

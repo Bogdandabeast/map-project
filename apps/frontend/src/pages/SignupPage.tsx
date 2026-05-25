@@ -1,57 +1,59 @@
 import { IonButton, IonInput, IonItem, IonText } from '@ionic/react'
 import { signUpSchema } from '@repo/validations'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { AuthLayout } from '../components/auth/AuthLayout'
+import { useMachine } from '../hooks/useMachine'
 import { authClient } from '../lib/auth-client'
-
-interface FieldErrors {
-  name?: string[]
-  email?: string[]
-  password?: string[]
-}
+import { authFormMachine } from './authFormMachine'
 
 /**
  * Signup page with name, email, and password form.
  * Validates input with Zod before calling authClient.signUp.email().
- * Displays inline field errors and API error messages.
+ * Displays inline field errors and API error messages using an FSM.
  */
 export function SignupPage() {
   const { data: session } = authClient.useSession()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState<FieldErrors>({})
-  const [apiError, setApiError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [state, send] = useMachine(authFormMachine)
+  const isSubmittingRef = useRef(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setErrors({})
-    setApiError('')
+    if (isSubmittingRef.current)
+      return
+
+    send({ type: 'SUBMIT' })
 
     const result = signUpSchema.safeParse({ name, email, password })
     if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
-      setErrors(fieldErrors)
+      send({ type: 'VALIDATION_FAILED', errors: result.error.flatten().fieldErrors })
       return
     }
 
-    setIsSubmitting(true)
+    isSubmittingRef.current = true
+    send({ type: 'VALIDATION_PASSED' })
     try {
       await authClient.signUp.email(result.data)
+      send({ type: 'API_SUCCESS' })
     }
     catch (err) {
-      setApiError(err instanceof Error ? err.message : 'Sign up failed')
+      send({ type: 'API_FAILED', error: err instanceof Error ? err.message : 'Sign up failed' })
     }
     finally {
-      setIsSubmitting(false)
+      isSubmittingRef.current = false
     }
   }
 
   if (session) {
     return <Redirect to="/map" />
   }
+
+  const isSubmitting = state.type === 'SUBMITTING'
+  const errors = state.type === 'ERROR' ? state.errors : {}
+  const apiError = state.type === 'ERROR' ? state.apiError : undefined
 
   return (
     <AuthLayout>
@@ -64,7 +66,11 @@ export function SignupPage() {
               labelPlacement="stacked"
               type="text"
               value={name}
-              onIonInput={e => setName(e.detail.value ?? '')}
+              onIonInput={(e) => {
+                setName(e.detail.value ?? '')
+                if (state.type === 'ERROR')
+                  send({ type: 'RESET' })
+              }}
               className={errors.name ? 'ion-invalid' : ''}
               fill="outline"
             />
@@ -81,7 +87,11 @@ export function SignupPage() {
               labelPlacement="stacked"
               type="email"
               value={email}
-              onIonInput={e => setEmail(e.detail.value ?? '')}
+              onIonInput={(e) => {
+                setEmail(e.detail.value ?? '')
+                if (state.type === 'ERROR')
+                  send({ type: 'RESET' })
+              }}
               className={errors.email ? 'ion-invalid' : ''}
               fill="outline"
             />
@@ -98,7 +108,11 @@ export function SignupPage() {
               labelPlacement="stacked"
               type="password"
               value={password}
-              onIonInput={e => setPassword(e.detail.value ?? '')}
+              onIonInput={(e) => {
+                setPassword(e.detail.value ?? '')
+                if (state.type === 'ERROR')
+                  send({ type: 'RESET' })
+              }}
               className={errors.password ? 'ion-invalid' : ''}
               fill="outline"
             />
