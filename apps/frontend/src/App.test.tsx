@@ -1,8 +1,9 @@
 import { render } from '@testing-library/react'
-import { expect, it, vi } from 'vitest'
+import { expect, it, mock } from 'bun:test'
+
 import App from './App'
 
-vi.mock('./components/map/view/MapView', () => ({
+mock.module('./components/map/view/MapView', () => ({
   default: () => <div data-testid="map-mock" />,
 }))
 
