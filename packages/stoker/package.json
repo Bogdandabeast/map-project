@@ -1,0 +1,15 @@
+{
+  "name": "@repo/stoker",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./middlewares": "./src/middlewares/index.ts",
+    "./openapi": "./src/openapi/index.ts",
+    "./http-status-phrases": "./src/http-status-phrases/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.12.9",
+    "zod": "^3.24.4"
+  }
+}
