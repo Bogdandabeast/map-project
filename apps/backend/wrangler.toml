@@ -1,0 +1,16 @@
+name = "map-project-backend"
+main = "src/app.js"
+compatibility_date = "2025-06-05"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "map-project-db"
+database_id = "map-project-db-local"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "map-project-images"
+
+[vars]
+NODE_ENV = "production"
+TRUSTED_ORIGINS = "http://localhost:5173"
