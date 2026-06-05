@@ -8,6 +8,9 @@
     "./openapi": "./src/openapi/index.ts",
     "./http-status-phrases": "./src/http-status-phrases/index.ts"
   },
+  "scripts": {
+    "test": "bun test"
+  },
   "dependencies": {
     "hono": "^4.12.9",
     "zod": "^3.24.4"
