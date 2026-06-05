@@ -40,15 +40,15 @@ describe('wrangler.toml', () => {
     expect(content).toContain('bucket_name = "map-project-images"')
   })
 
-  it('should set NODE_ENV and TRUSTED_ORIGINS vars', () => {
+  it('should keep env vars in .dev.vars, not wrangler.toml', () => {
     const content = readWranglerToml()
-    expect(content).toContain('[vars]')
-    expect(content).toContain('NODE_ENV = "production"')
-    expect(content).toContain('TRUSTED_ORIGINS = "http://localhost:5173"')
+    // Environment vars belong in .dev.vars for local dev, not in wrangler.toml [vars]
+    expect(content).not.toContain('[vars]')
+    expect(content).toContain('.dev.vars')
   })
 
   it('should declare a compatibility date', () => {
     const content = readWranglerToml()
-    expect(content).toMatch(/compatibility_date\s*=\s*"2025-06-05"/)
+    expect(content).toMatch(/compatibility_date\s*=\s*"2026-06-05"/)
   })
 })
