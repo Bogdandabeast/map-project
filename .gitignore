@@ -9,6 +9,9 @@ build/
 .next/
 out/
 .turbo/
+openspec/
+.agents/
+.atl/
 
 # Testing
 coverage/
