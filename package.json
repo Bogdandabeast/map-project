@@ -32,5 +32,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "patchedDependencies": {
+    "@better-auth/kysely-adapter@1.6.14": "patches/@better-auth%2Fkysely-adapter@1.6.14.patch"
+  }
 }
