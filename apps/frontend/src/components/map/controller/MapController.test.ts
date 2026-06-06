@@ -1,27 +1,25 @@
 import type { IMapModel } from '../model/interfaces/IMapModel'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import { MapController } from './MapController'
 
-beforeAll(() => {
-  class ResizeObserverMock {
-    observe = vi.fn()
-    unobserve = vi.fn()
-    disconnect = vi.fn()
-  }
-
-  vi.stubGlobal('ResizeObserver', ResizeObserverMock)
-})
+// Stub ResizeObserver globally (needed before module evaluation)
+class ResizeObserverMock {
+  observe = mock()
+  unobserve = mock()
+  disconnect = mock()
+}
+globalThis.ResizeObserver = ResizeObserverMock
 
 describe('mapController', () => {
   const INITIAL_CENTER: [number, number] = [-3.7038, 40.4168]
   const INITIAL_ZOOM = 6
 
   const createFakeModel = (): IMapModel => ({
-    getCenter: vi.fn(() => INITIAL_CENTER),
-    getZoom: vi.fn(() => INITIAL_ZOOM),
-    setCenter: vi.fn(),
-    setZoom: vi.fn(),
-    setMap: vi.fn(),
+    getCenter: mock(() => INITIAL_CENTER),
+    getZoom: mock(() => INITIAL_ZOOM),
+    setCenter: mock(),
+    setZoom: mock(),
+    setMap: mock(),
   })
 
   let fakeModel: IMapModel

@@ -1,4 +1,4 @@
-import { vi } from 'vitest'
+import { mock } from 'bun:test'
 // jest-dom adds custom jest matchers for asserting on DOM nodes.
 // allows you to do things like:
 // expect(element).toHaveTextContent(/react/i)
@@ -14,8 +14,8 @@ globalThis.matchMedia = globalThis.matchMedia || function () {
 }
 
 class ResizeObserverMock {
-  observe = vi.fn()
-  unobserve = vi.fn()
-  disconnect = vi.fn()
+  observe = mock()
+  unobserve = mock()
+  disconnect = mock()
 }
-vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+globalThis.ResizeObserver = ResizeObserverMock

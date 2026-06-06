@@ -1,0 +1,99 @@
+.explore-page {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.explore-page.desktop {
+  grid-template-columns: 60% 40%;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ui-overlay > * {
+  pointer-events: auto;
+}
+
+.search-container {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 20px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+  scrollbar-width: none;
+}
+
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-sidebar {
+  height: 100vh;
+  background: var(--background);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  overflow-y: auto;
+}
+
+.feed-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feed-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.fab-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 30;
+}
+
+@media (max-width: 1023px) {
+  .explore-page.desktop {
+    grid-template-columns: 1fr;
+  }
+  
+  .feed-sidebar {
+    display: none;
+  }
+}
