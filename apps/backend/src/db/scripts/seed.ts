@@ -2,18 +2,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { role } from "./auth.schema";
-
-/**
- * Seeds the `role` table with default application roles.
- *
- * Run once against the local D1 database:
- *   bun run src/db/seed.ts
- *
- * For production D1, use wrangler:
- *   wrangler d1 execute map-project-db --remote \
- *     --command="INSERT OR IGNORE INTO role (name) VALUES ('registered'),('admin'),('premium'),('moderator')"
- */
+import { role } from "../schema";
 
 function findLocalD1Db(): string {
   const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
@@ -26,7 +15,17 @@ function findLocalD1Db(): string {
   return join(d1Dir, files[0]);
 }
 
-async function seed() {
+/**
+ * Seeds the `role` table with default application roles.
+ *
+ * Local dev:
+ *   bun run src/db/scripts/seed.ts
+ *
+ * Production D1:
+ *   wrangler d1 execute map-project-db --remote \
+ *     --command="INSERT OR IGNORE INTO role (name) VALUES ('registered'),('admin'),('premium'),('moderator')"
+ */
+export async function seedUserRoles() {
   const db = drizzle(createClient({ url: `file:${findLocalD1Db()}` }));
 
   await db
@@ -43,4 +42,5 @@ async function seed() {
   process.exit(0);
 }
 
-seed();
+// Run directly: bun run src/db/scripts/seed.ts
+seedUserRoles();
