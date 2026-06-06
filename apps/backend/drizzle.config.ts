@@ -21,7 +21,7 @@ function findLocalD1Db(): string {
 }
 
 export default defineConfig({
-  schema: './src/db/schemas.ts',
+  schema: './src/db/schema/index.ts',
   out: './migrations',
   dialect: 'sqlite',
   dbCredentials: {

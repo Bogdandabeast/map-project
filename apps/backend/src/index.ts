@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { createAuth } from "./db/auth";
+import { createAuth } from "./db/lib/auth";
 
 const app = new Hono<{ Bindings: { DB: D1Database; BETTER_AUTH_SECRET: string; BETTER_AUTH_URL: string } }>();
 
