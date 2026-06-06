@@ -1,6 +1,11 @@
 import { relations, sql } from 'drizzle-orm'
 import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
+export const role = sqliteTable(
+  'role', {
+    name: text().primaryKey(),
+  },
+);
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
@@ -16,6 +21,7 @@ export const user = sqliteTable('user', {
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  role: text().notNull().default("registered").references(() => role.name, {onDelete: "restrict", onUpdate: "cascade"})
 })
 
 export const session = sqliteTable(
@@ -83,13 +89,32 @@ export const verification = sqliteTable(
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
-  },
+    },
   table => [index('verification_identifier_idx').on(table.identifier)],
 )
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userSettings = sqliteTable(
+  'user_settings',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    language: text('language').notNull().default('es'),
+    theme: text('theme').notNull().default('system'),
+    notificationsEnabled: integer('notifications_enabled', { mode: 'boolean' })
+      .notNull()
+      .default(true),
+  },
+)
+
+
+export const userRelations = relations(user, ({ many, one }) => ({
   sessions: many(session),
   accounts: many(account),
+  settings: one(userSettings, {
+    fields: [user.id],
+    references: [userSettings.userId],
+  }),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -102,6 +127,13 @@ export const sessionRelations = relations(session, ({ one }) => ({
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
+    references: [user.id],
+  }),
+}))
+
+export const userSettingsRelations = relations(userSettings, ({ one }) => ({
+  user: one(user, {
+    fields: [userSettings.userId],
     references: [user.id],
   }),
 }))

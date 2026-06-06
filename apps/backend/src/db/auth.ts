@@ -1,6 +1,7 @@
 /* eslint-disable node/prefer-global/process -- Cloudflare Workers nodejs_compat */
 import { betterAuth } from 'better-auth'
-
+import { admin } from "better-auth/plugins"
+import { adminClient } from "better-auth/client/plugins"
 /**
  * Better Auth with native D1 support.
  *
@@ -18,6 +19,9 @@ export const auth = betterAuth({
   },
   baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
   secret: process.env.BETTER_AUTH_SECRET || '',
+  plugins: [
+          admin()
+      ]
 })
 
 /**
@@ -31,5 +35,9 @@ export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET?: string, B
     },
     baseURL: env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: env.BETTER_AUTH_SECRET || '',
+
+    plugins: [
+            adminClient()
+        ]
   })
 }
