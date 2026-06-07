@@ -12,6 +12,17 @@ import { createClient } from "@libsql/client"
 import { admin, bearer, jwt } from "better-auth/plugins"
 import { user, session, account, verification } from "./src/db/schema/auth"
 
+function requireSecret(value: string | undefined, name: string): string {
+  if (!value) {
+    throw new Error(
+      `Missing required env var: ${name}. `
+      + `Better Auth requires a secret to sign tokens. `
+      + `Generate one with: openssl rand -hex 32`,
+    )
+  }
+  return value
+}
+
 const db = drizzle(createClient({ url: ":memory:" }))
 
 export const auth = betterAuth({
@@ -27,6 +38,6 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  secret: process.env.BETTER_AUTH_SECRET || "",
+  secret: requireSecret(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET"),
   plugins: [admin(), bearer(), jwt()],
 })

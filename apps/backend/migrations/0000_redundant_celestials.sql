@@ -61,7 +61,7 @@ CREATE TABLE `user` (
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`role` text DEFAULT 'registered' NOT NULL,
-	`banned` integer DEFAULT false,
+	`banned` integer DEFAULT false NOT NULL,
 	`ban_reason` text,
 	`ban_expires` integer,
 	FOREIGN KEY (`role`) REFERENCES `role`(`name`) ON UPDATE cascade ON DELETE restrict
@@ -72,13 +72,14 @@ CREATE TABLE `user_games` (
 	`user_id` text NOT NULL,
 	`game_id` text NOT NULL,
 	`skill_level` text,
-	`owned` integer DEFAULT true,
+	`owned` integer DEFAULT true NOT NULL,
 	`added_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	PRIMARY KEY(`user_id`, `game_id`),
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`game_id`) REFERENCES `game`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE INDEX `user_games_game_id_idx` ON `user_games` (`game_id`);--> statement-breakpoint
 CREATE TABLE `user_settings` (
 	`user_id` text PRIMARY KEY NOT NULL,
 	`language` text DEFAULT 'es' NOT NULL,

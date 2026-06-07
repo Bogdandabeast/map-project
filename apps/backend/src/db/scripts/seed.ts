@@ -12,6 +12,12 @@ function findLocalD1Db(): string {
   if (files.length === 0) {
     throw new Error(`No local D1 database found in ${d1Dir}. Run wrangler first.`)
   }
+  if (files.length > 1) {
+    files.sort()
+    console.warn(
+      `Found ${files.length} .sqlite files in ${d1Dir}, using the first alphabetically: ${files[0]}`,
+    )
+  }
   return join(d1Dir, files[0])
 }
 

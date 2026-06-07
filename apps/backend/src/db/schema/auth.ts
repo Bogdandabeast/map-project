@@ -24,7 +24,7 @@ export const user = sqliteTable("user", {
     .notNull()
     .default("registered")
     .references(() => role.name, { onDelete: "restrict", onUpdate: "cascade" }),
-  banned: integer("banned", { mode: "boolean" }).default(false),
+  banned: integer("banned", { mode: "boolean" }).default(false).notNull(),
   banReason: text("ban_reason"),
   banExpires: integer("ban_expires", { mode: "timestamp_ms" }),
 });
