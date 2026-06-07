@@ -50,7 +50,7 @@ export async function createTestAuth() {
   const ctx = await auth.$context
   return {
     auth,
-    test: ctx.test as TestHelpers,
+    test: (ctx as unknown as { test: TestHelpers }).test,
   }
 }
 

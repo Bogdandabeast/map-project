@@ -9,6 +9,8 @@ import { describe, expect, it, beforeAll } from "bun:test"
 import { Hono } from "hono"
 import type { MiddlewareHandler } from "hono"
 import type { AppEnv } from "../src/types/hono"
+import { createAuth } from "../src/db/lib/auth"
+import type { AuthFactory } from "../src/db/lib/auth"
 import { createTestAuth } from "./auth-setup"
 import type { AuthCtx } from "./auth-setup"
 import {
@@ -23,7 +25,7 @@ import {
 // ── Shared state ───────────────────────────────────────────────
 
 let ctx: AuthCtx
-const authFactory = () => ctx.auth
+const authFactory: AuthFactory = () => ctx.auth as unknown as ReturnType<typeof createAuth>
 
 /** Wrapped middleware helpers that use the test auth. */
 const testOptionalAuth: typeof optionalAuth = () =>
@@ -126,7 +128,7 @@ describe("requireRole", () => {
       )
       const res = await app.fetch(unauthReq("/admin"))
       expect(res.status).toBe(401)
-      const body = await res.json()
+      const body = await res.json() as { error: string }
       expect(body.error).toBe("Unauthorized")
     })
 
@@ -155,7 +157,7 @@ describe("requireRole", () => {
       const { req } = await authedUser("visitor")
       const res = await app.fetch(req("/admin"))
       expect(res.status).toBe(403)
-      const body = await res.json()
+      const body = await res.json() as { error: string }
       expect(body.error).toBe("Forbidden")
     })
 

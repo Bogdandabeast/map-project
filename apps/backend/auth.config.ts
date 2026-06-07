@@ -39,5 +39,21 @@ export const auth = betterAuth({
     enabled: true,
   },
   secret: requireSecret(process.env.BETTER_AUTH_SECRET, "BETTER_AUTH_SECRET"),
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+    },
+  },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github"],
+    },
+  },
   plugins: [admin(), bearer(), jwt()],
 })

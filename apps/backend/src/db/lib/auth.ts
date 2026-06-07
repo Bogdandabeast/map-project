@@ -32,6 +32,22 @@ function createStaticAuth() {
     },
     baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: requireSecret(process.env.BETTER_AUTH_SECRET, 'BETTER_AUTH_SECRET'),
+    socialProviders: {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID || '',
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      },
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID || '',
+        clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+      },
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ['google', 'github'],
+      },
+    },
     plugins: [admin(), bearer(), jwt()],
   })
 }
@@ -58,7 +74,15 @@ export const auth = new Proxy<ReturnType<typeof betterAuth>>(
 /**
  * Create an auth instance with the real D1 binding from the Worker env.
  */
-export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET: string, BETTER_AUTH_URL?: string }) {
+export function createAuth(env: {
+  DB: D1Database
+  BETTER_AUTH_SECRET: string
+  BETTER_AUTH_URL?: string
+  GOOGLE_CLIENT_ID?: string
+  GOOGLE_CLIENT_SECRET?: string
+  GITHUB_CLIENT_ID?: string
+  GITHUB_CLIENT_SECRET?: string
+}) {
   return betterAuth({
     database: env.DB,
     emailAndPassword: {
@@ -66,7 +90,22 @@ export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET: string, BE
     },
     baseURL: env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: requireSecret(env.BETTER_AUTH_SECRET, 'env.BETTER_AUTH_SECRET'),
-
+    socialProviders: {
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID || '',
+        clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+      },
+      github: {
+        clientId: env.GITHUB_CLIENT_ID || '',
+        clientSecret: env.GITHUB_CLIENT_SECRET || '',
+      },
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ['google', 'github', 'email-password'],
+      },
+    },
     plugins: [
       admin(),
       bearer(),
@@ -80,4 +119,5 @@ export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET: string, BE
  * The default implementation is `createAuth`; tests inject a
  * libsql-backed alternative via the middleware test helpers.
  */
-export type AuthFactory = (env: Record<string, unknown>) => ReturnType<typeof createAuth>
+type CreateAuthEnv = Parameters<typeof createAuth>[0]
+export type AuthFactory = (env: CreateAuthEnv) => ReturnType<typeof createAuth>

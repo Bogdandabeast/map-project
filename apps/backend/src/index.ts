@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { createAuth } from "./db/lib/auth";
+import type { AppEnv } from "./types/hono";
 
-const app = new Hono<{ Bindings: { DB: D1Database; BETTER_AUTH_SECRET: string; BETTER_AUTH_URL: string } }>();
+const app = new Hono<AppEnv>();
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
