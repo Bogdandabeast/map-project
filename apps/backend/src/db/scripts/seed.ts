@@ -1,18 +1,18 @@
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
-import { readdirSync } from "node:fs";
-import { join } from "node:path";
-import { role } from "../schema";
+import { readdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { createClient } from '@libsql/client'
+import { drizzle } from 'drizzle-orm/libsql'
+import { role } from '../schema'
 
 function findLocalD1Db(): string {
-  const d1Dir = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
+  const d1Dir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject'
   const files = readdirSync(d1Dir).filter(
-    (f) => f.endsWith(".sqlite") && f !== "metadata.sqlite",
-  );
+    f => f.endsWith('.sqlite') && f !== 'metadata.sqlite',
+  )
   if (files.length === 0) {
-    throw new Error(`No local D1 database found in ${d1Dir}. Run wrangler first.`);
+    throw new Error(`No local D1 database found in ${d1Dir}. Run wrangler first.`)
   }
-  return join(d1Dir, files[0]);
+  return join(d1Dir, files[0])
 }
 
 /**
@@ -26,21 +26,25 @@ function findLocalD1Db(): string {
  *     --command="INSERT OR IGNORE INTO role (name) VALUES ('registered'),('admin'),('premium'),('moderator')"
  */
 export async function seedUserRoles() {
-  const db = drizzle(createClient({ url: `file:${findLocalD1Db()}` }));
+  const db = drizzle(createClient({ url: `file:${findLocalD1Db()}` }))
 
   await db
     .insert(role)
     .values([
-      { name: "registered" },
-      { name: "admin" },
-      { name: "premium" },
-      { name: "moderator" },
+      { name: 'visitor' },
+      { name: 'registered' },
+      { name: 'premium' },
+      { name: 'moderator' },
+      { name: 'admin' },
     ])
-    .onConflictDoNothing();
+    .onConflictDoNothing()
 
-  console.log("✅ Roles seeded");
-  process.exit(0);
+  console.log('✅ Roles seeded')
 }
 
 // Run directly: bun run src/db/scripts/seed.ts
-seedUserRoles();
+if (import.meta.main) {
+  await seedUserRoles()
+  // eslint-disable-next-line node/prefer-global/process
+  process.exit(0)
+}
