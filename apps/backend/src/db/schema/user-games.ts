@@ -1,22 +1,24 @@
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
-import { user } from "./auth";
-import { game } from "./game";
+import { sql } from 'drizzle-orm'
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { user } from './auth'
+import { game } from './game'
 
 export const userGames = sqliteTable(
-  "user_games",
+  'user_games',
   {
-    userId: text("user_id")
+    userId: text('user_id')
       .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    gameId: text("game_id")
+      .references(() => user.id, { onDelete: 'cascade' }),
+    gameId: text('game_id')
       .notNull()
-      .references(() => game.id, { onDelete: "cascade" }),
-    skillLevel: text("skill_level"), // 'beginner' | 'intermediate' | 'advanced'
-    owned: integer("owned", { mode: "boolean" }).default(true),
-    addedAt: integer("added_at", { mode: "timestamp_ms" })
-      .$defaultFn(() => new Date()),
+      .references(() => game.id, { onDelete: 'cascade' }),
+    skillLevel: text('skill_level'), // 'beginner' | 'intermediate' | 'advanced'
+    owned: integer('owned', { mode: 'boolean' }).default(true),
+    addedAt: integer('added_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
   },
-  (table) => ({
+  table => ({
     pk: primaryKey({ columns: [table.userId, table.gameId] }),
   }),
-);
+)

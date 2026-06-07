@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs'
+import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig } from 'drizzle-kit'
 
@@ -17,7 +17,18 @@ function findLocalD1Db(): string {
       `No local D1 database found in ${d1Dir}. Run wrangler first.`,
     )
   }
-  return join(d1Dir, files[0])
+  // Pick the most-recently modified file so content-hash changes don't
+  // cause ambiguity. The sort below is stable because readdirSync order
+  // is OS-dependent and we want deterministic behaviour.
+  const sorted = files
+    .map(f => ({ name: f, mtime: statSync(join(d1Dir, f)).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime)
+  if (sorted.length > 1) {
+    console.warn(
+      `Found ${sorted.length} .sqlite files in ${d1Dir}, using the most recent: ${sorted[0].name}`,
+    )
+  }
+  return join(d1Dir, sorted[0].name)
 }
 
 export default defineConfig({
