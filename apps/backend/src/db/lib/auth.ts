@@ -25,22 +25,13 @@ function requireSecret(value: string | undefined, name: string): string {
  */
 
 function createStaticAuth() {
-  const secret = process.env.BETTER_AUTH_SECRET
-  if (!secret) {
-    console.warn(
-      '[better-auth] BETTER_AUTH_SECRET is not set. '
-      + 'Static auth used by CLI tools may fail. '
-      + 'Set it in your environment or .env file.\n'
-      + '  Generate one with: openssl rand -hex 32',
-    )
-  }
   return betterAuth({
     database: null as unknown as D1Database,
     emailAndPassword: {
       enabled: true,
     },
     baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
-    secret: secret || '',
+    secret: requireSecret(process.env.BETTER_AUTH_SECRET, 'BETTER_AUTH_SECRET'),
     plugins: [admin(), bearer(), jwt()],
   })
 }

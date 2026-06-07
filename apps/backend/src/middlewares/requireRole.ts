@@ -62,5 +62,11 @@ export function requireRoleMiddleware(
  * ```
  */
 export function requireRole(...roles: string[]): MiddlewareHandler<AppEnv> {
+  if (roles.length === 0) {
+    throw new Error(
+      'requireRole requires at least one role. ' +
+      'Usage: requireRole("admin") or requireRole("moderator", "admin")',
+    )
+  }
   return requireRoleMiddleware(createAuth, roles)
 }

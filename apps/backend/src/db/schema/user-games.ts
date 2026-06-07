@@ -13,7 +13,7 @@ export const userGames = sqliteTable(
       .notNull()
       .references(() => game.id, { onDelete: 'cascade' }),
     skillLevel: text('skill_level'), // 'beginner' | 'intermediate' | 'advanced'
-    owned: integer('owned', { mode: 'boolean' }).default(true),
+    owned: integer('owned', { mode: 'boolean' }).default(true).notNull(),
     addedAt: integer('added_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

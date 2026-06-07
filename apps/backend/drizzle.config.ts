@@ -18,11 +18,11 @@ function findLocalD1Db(): string {
     )
   }
   // Pick the most-recently modified file so content-hash changes don't
-  // cause ambiguity. The sort below is stable because readdirSync order
-  // is OS-dependent and we want deterministic behaviour.
+  // cause ambiguity. The sort below uses a tie-breaker on filename so
+  // the result is fully deterministic even when mtimeMs are equal.
   const sorted = files
     .map(f => ({ name: f, mtime: statSync(join(d1Dir, f)).mtimeMs }))
-    .sort((a, b) => b.mtime - a.mtime)
+    .sort((a, b) => b.mtime - a.mtime || a.name.localeCompare(b.name))
   if (sorted.length > 1) {
     console.warn(
       `Found ${sorted.length} .sqlite files in ${d1Dir}, using the most recent: ${sorted[0].name}`,
