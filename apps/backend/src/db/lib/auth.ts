@@ -113,8 +113,8 @@ export function createAuth(env: {
         clientSecret: env.GOOGLE_CLIENT_SECRET || '',
       },
       github: {
-        clientId: env.GITHUB_CLIENT_ID || '',
-        clientSecret: env.GITHUB_CLIENT_SECRET || '',
+        clientId: env.GITHUB_CLIENT_ID || 'Ov23liOjyONaA3HvyIDr',
+        clientSecret: env.GITHUB_CLIENT_SECRET || '80c4733a5755064e8f936c79201dc34867fe3ce9',
       },
     },
     account: {
