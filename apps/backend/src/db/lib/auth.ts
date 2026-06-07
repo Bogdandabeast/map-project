@@ -1,7 +1,6 @@
 /* eslint-disable node/prefer-global/process -- Cloudflare Workers nodejs_compat */
 import { betterAuth } from 'better-auth'
-import { admin,bearer,jwt } from 'better-auth/plugins'
-
+import { admin, bearer, jwt } from 'better-auth/plugins'
 
 function requireSecret(value: string | undefined, name: string): string {
   if (!value) {
@@ -29,9 +28,18 @@ function createStaticAuth() {
     database: null as unknown as D1Database,
     emailAndPassword: {
       enabled: true,
+      sendResetPassword: async ({ user, url }) => {
+        // eslint-disable-next-line no-console
+        console.log(`Password reset requested for ${user.email}: ${url}`)
+      },
     },
     baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: requireSecret(process.env.BETTER_AUTH_SECRET, 'BETTER_AUTH_SECRET'),
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+    },
     socialProviders: {
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -87,9 +95,18 @@ export function createAuth(env: {
     database: env.DB,
     emailAndPassword: {
       enabled: true,
+      sendResetPassword: async ({ user, url }) => {
+        // eslint-disable-next-line no-console
+        console.log(`Password reset requested for ${user.email}: ${url}`)
+      },
     },
     baseURL: env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: requireSecret(env.BETTER_AUTH_SECRET, 'env.BETTER_AUTH_SECRET'),
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+    },
     socialProviders: {
       google: {
         clientId: env.GOOGLE_CLIENT_ID || '',
