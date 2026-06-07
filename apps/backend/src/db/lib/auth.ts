@@ -79,7 +79,14 @@ export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET: string, BE
     plugins: [
       admin(),
       bearer(),
-        jwt()
+      jwt(),
     ],
   })
 }
+
+/**
+ * Factory signature for creating an auth instance from environment.
+ * The default implementation is `createAuth`; tests inject a
+ * libsql-backed alternative via the middleware test helpers.
+ */
+export type AuthFactory = (env: Record<string, unknown>) => ReturnType<typeof createAuth>

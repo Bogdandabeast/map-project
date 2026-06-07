@@ -1,0 +1,57 @@
+/**
+ * Test helper for RBAC middleware tests.
+ *
+ * Creates an in-memory SQLite database, applies the existing Drizzle
+ * migrations via drizzle-orm/libsql/migrator, then builds a Better Auth
+ * instance backed by the drizzle adapter. The `testUtils` plugin lets us
+ * create users and generate bearer tokens quickly.
+ */
+import { betterAuth } from "better-auth"
+import { admin, bearer, jwt, testUtils } from "better-auth/plugins"
+import { drizzleAdapter } from "@better-auth/drizzle-adapter"
+import { drizzle } from "drizzle-orm/libsql"
+import { migrate } from "drizzle-orm/libsql/migrator"
+import { createClient } from "@libsql/client"
+import { join } from "node:path"
+import type { TestHelpers } from "better-auth/plugins"
+import { role, user, session, account, verification, jwks } from "../src/db/schema/auth"
+
+// ── Setup ──────────────────────────────────────────────────────
+
+export async function createTestAuth() {
+  const client = createClient({ url: ":memory:" })
+  const db = drizzle(client)
+
+  // Apply existing migrations so the in-memory DB has all tables.
+  await migrate(db, {
+    migrationsFolder: join(import.meta.dir, "../migrations"),
+  })
+
+  // Seed the role table — the user.role FK references it.
+  await db.insert(role).values([
+    { name: "visitor" },
+    { name: "registered" },
+    { name: "premium" },
+    { name: "moderator" },
+    { name: "admin" },
+  ])
+
+  const auth = betterAuth({
+    database: drizzleAdapter(db, {
+      provider: "sqlite",
+      schema: { user, session, account, verification, jwks },
+    }),
+    emailAndPassword: { enabled: true },
+    secret: "test-secret-32-chars-test-secret-32-c",
+    baseURL: "http://localhost:3000",
+    plugins: [admin(), bearer(), jwt(), testUtils()],
+  })
+
+  const ctx = await auth.$context
+  return {
+    auth,
+    test: ctx.test as TestHelpers,
+  }
+}
+
+export type AuthCtx = Awaited<ReturnType<typeof createTestAuth>>
