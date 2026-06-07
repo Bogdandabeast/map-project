@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1780788173258,
-      "tag": "0000_boring_wong",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1780788463526,
-      "tag": "0001_serious_rogue",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1780865325225,
-      "tag": "0002_narrow_nightshade",
+      "when": 1780865455372,
+      "tag": "0000_redundant_celestials",
       "breakpoints": true
     }
   ]

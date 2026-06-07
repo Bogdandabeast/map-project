@@ -11,11 +11,28 @@ CREATE TABLE `account` (
 	`scope` text,
 	`password` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
-	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE INDEX `account_userId_idx` ON `account` (`user_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `account_provider_account_unique` ON `account` (`provider_id`,`account_id`);--> statement-breakpoint
+CREATE TABLE `game` (
+	`id` text PRIMARY KEY NOT NULL,
+	`title` text NOT NULL,
+	`description` text,
+	`image_url` text,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `jwks` (
+	`id` text PRIMARY KEY NOT NULL,
+	`public_key` text NOT NULL,
+	`private_key` text NOT NULL,
+	`created_at` integer NOT NULL,
+	`expires_at` integer
+);
+--> statement-breakpoint
 CREATE TABLE `role` (
 	`name` text PRIMARY KEY NOT NULL
 );
@@ -25,10 +42,11 @@ CREATE TABLE `session` (
 	`expires_at` integer NOT NULL,
 	`token` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
-	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer NOT NULL,
 	`ip_address` text,
 	`user_agent` text,
 	`user_id` text NOT NULL,
+	`impersonated_by` text,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -43,10 +61,24 @@ CREATE TABLE `user` (
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`role` text DEFAULT 'registered' NOT NULL,
+	`banned` integer DEFAULT false,
+	`ban_reason` text,
+	`ban_expires` integer,
 	FOREIGN KEY (`role`) REFERENCES `role`(`name`) ON UPDATE cascade ON DELETE restrict
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint
+CREATE TABLE `user_games` (
+	`user_id` text NOT NULL,
+	`game_id` text NOT NULL,
+	`skill_level` text,
+	`owned` integer DEFAULT true,
+	`added_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	PRIMARY KEY(`user_id`, `game_id`),
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`game_id`) REFERENCES `game`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `user_settings` (
 	`user_id` text PRIMARY KEY NOT NULL,
 	`language` text DEFAULT 'es' NOT NULL,
