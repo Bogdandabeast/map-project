@@ -1,6 +1,7 @@
 /* eslint-disable node/prefer-global/process -- Cloudflare Workers nodejs_compat */
 import { betterAuth } from 'better-auth'
-import { admin } from 'better-auth/plugins'
+import { admin,bearer,jwt } from 'better-auth/plugins'
+
 
 function requireSecret(value: string | undefined, name: string): string {
   if (!value) {
@@ -40,7 +41,7 @@ function createStaticAuth() {
     },
     baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     secret: secret || '',
-    plugins: [admin()],
+    plugins: [admin(), bearer(), jwt()],
   })
 }
 
@@ -77,6 +78,8 @@ export function createAuth(env: { DB: D1Database, BETTER_AUTH_SECRET: string, BE
 
     plugins: [
       admin(),
+      bearer(),
+        jwt()
     ],
   })
 }

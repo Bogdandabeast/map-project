@@ -1,5 +1,5 @@
 // ── Core (Better Auth) ──────────────────────────────────────────
-export { user, session, account, verification, role } from "./auth";
+export { user, session, account, verification, role, jwks } from "./auth";
 
 // ── App tables ──────────────────────────────────────────────────
 export { userSettings } from "./user-settings";
