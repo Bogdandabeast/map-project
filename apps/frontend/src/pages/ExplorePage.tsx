@@ -5,6 +5,8 @@ import { Chip } from '../components/shared/Chip';
 import { FAB } from '../components/shared/FAB';
 import { BottomSheet } from '../components/shared/BottomSheet';
 import { PlanCard } from '../components/shared/PlanCard';
+import { OAuthButtons } from '../components/auth/OAuthButtons';
+import { useAuth } from '../components/auth/AuthProvider';
 import './ExplorePage.css';
 
 interface Plan {
@@ -25,6 +27,7 @@ export function ExplorePage() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const { isAuthenticated, user, isPending } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -53,6 +56,15 @@ export function ExplorePage() {
         <MapView />
         
         <div className="ui-overlay">
+          <div className="auth-corner">
+            {isPending ? (
+              <span className="auth-loading">…</span>
+            ) : isAuthenticated ? (
+              <span className="auth-user">👤 {user?.name || user?.email}</span>
+            ) : (
+              <OAuthButtons />
+            )}
+          </div>
           <div className="search-container">
             <SearchBar 
               value={searchQuery} 
