@@ -2,7 +2,9 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
 import { Redirect, Route } from 'react-router-dom'
 
+import { AuthProvider } from './components/auth/AuthProvider'
 import { MapPage } from './pages/MapPage'
+import { ExplorePage } from './pages/ExplorePage'
 
 import '@ionic/react/css/core.css'
 import '@ionic/react/css/normalize.css'
@@ -22,16 +24,21 @@ setupIonicReact()
 
 const App: React.FC = () => (
   <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/map">
-          <MapPage />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/map" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
+    <AuthProvider>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/map">
+            <MapPage />
+          </Route>
+          <Route exact path="/explore">
+            <ExplorePage />
+          </Route>
+          <Route exact path="/">
+            <Redirect to="/explore" />
+          </Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </AuthProvider>
   </IonApp>
 )
 

@@ -46,6 +46,24 @@
   padding: 0 20px;
 }
 
+.auth-corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  gap: 8px;
+}
+
+.auth-user {
+  background: var(--ion-color-primary, #ff5722);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .filter-chips {
   display: flex;
   gap: 8px;
