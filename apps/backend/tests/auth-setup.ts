@@ -29,6 +29,7 @@ export async function createTestAuth() {
 
   // Seed the role table — the user.role FK references it.
   await db.insert(role).values([
+    { name: "user" },
     { name: "visitor" },
     { name: "registered" },
     { name: "premium" },
@@ -44,6 +45,22 @@ export async function createTestAuth() {
     emailAndPassword: { enabled: true },
     secret: "test-secret-32-chars-test-secret-32-c",
     baseURL: "http://localhost:3000",
+    socialProviders: {
+      google: {
+        clientId: "test-google-client-id",
+        clientSecret: "test-google-client-secret",
+      },
+      github: {
+        clientId: "test-github-client-id",
+        clientSecret: "test-github-client-secret",
+      },
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "github", "email-password"],
+      },
+    },
     plugins: [admin(), bearer(), jwt(), testUtils()],
   })
 
