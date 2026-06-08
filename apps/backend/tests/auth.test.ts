@@ -168,7 +168,7 @@ describe("requireRole", () => {
         (c) => c.json({ ok: true }),
       )
       const { req } = await authedUser("user")
-      const res = await app.fetch(req("/mod"))
+      const res = await app.fetch(req("/admin"))
       expect(res.status).toBe(403)
     })
   })
