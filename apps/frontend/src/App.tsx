@@ -16,6 +16,8 @@ import {
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
 import {
+  addCircleOutline,
+  calendarOutline,
   compassOutline,
   logInOutline,
   mapOutline,
@@ -32,6 +34,9 @@ import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage'
 import { LoginPage } from './pages/Auth/LoginPage'
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage'
 import { SignupPage } from './pages/Auth/SignupPage'
+import { CreateEventPage } from './pages/events/CreateEventPage'
+import { EventDetailPage } from './pages/events/EventDetailPage'
+import { MyEventsPage } from './pages/events/MyEventsPage'
 import { ExplorePage } from './pages/ExplorePage'
 import { MapPage } from './pages/MapPage'
 import { MyProfilePage } from './pages/Profile/MyProfilePage'
@@ -57,6 +62,8 @@ setupIonicReact()
 const menuItems = [
   { path: '/explore', icon: compassOutline, label: 'Explorar', auth: true },
   { path: '/map', icon: mapOutline, label: 'Mapa', auth: true },
+  { path: '/my/events', icon: calendarOutline, label: 'Mis eventos', auth: true },
+  { path: '/events/create', icon: addCircleOutline, label: 'Crear evento', auth: true },
   { path: '/profile', icon: personOutline, label: 'Perfil', auth: true },
   { path: '/settings', icon: settingsOutline, label: 'Ajustes', auth: true },
   { path: '/login', icon: logInOutline, label: 'Login', auth: false },
@@ -102,6 +109,11 @@ const App: React.FC = () => (
             <Route exact path="/settings"><ProtectedRoute><SettingsPage /></ProtectedRoute></Route>
             <Route exact path="/map"><ProtectedRoute><MapPage /></ProtectedRoute></Route>
             <Route exact path="/explore"><ProtectedRoute><ExplorePage /></ProtectedRoute></Route>
+
+            {/* Events — requires session */}
+            <Route exact path="/events/create"><ProtectedRoute><CreateEventPage /></ProtectedRoute></Route>
+            <Route exact path="/events/:id"><ProtectedRoute><EventDetailPage /></ProtectedRoute></Route>
+            <Route exact path="/my/events"><ProtectedRoute><MyEventsPage /></ProtectedRoute></Route>
 
             <Route exact path="/"><Redirect to="/explore" /></Route>
           </IonRouterOutlet>
