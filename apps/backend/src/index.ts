@@ -5,6 +5,10 @@ import { cors } from 'hono/cors'
 import { createAuth } from './db/lib/auth'
 import { parseEnv } from './env'
 import { usersRoutes } from './routes/users'
+import { eventRoutes } from './routes/events/events.routes'
+import { uploadRoutes } from './routes/events/upload.routes'
+import { attendeeRoutes } from './routes/events/attendees.routes'
+import { meRoutes } from './routes/events/me.routes'
 
 const app = new Hono<AppEnv>()
 
@@ -36,5 +40,11 @@ app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
 })
 
 app.route('/api/users', usersRoutes)
+
+// Events domain — mounted under /api/events and /api/me/events
+app.route('/api/events', eventRoutes)
+app.route('/api/events', uploadRoutes)
+app.route('/api/events', attendeeRoutes)
+app.route('/api/me/events', meRoutes)
 
 export default app
