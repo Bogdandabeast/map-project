@@ -40,9 +40,8 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
   routes.get(
     '/me/avatar/upload-url',
     requireRoleMiddleware(authFactory, [
-      'registered',
+      'user',
       'premium',
-      'moderator',
       'admin',
     ]),
     async (c) => {
@@ -68,9 +67,8 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
   routes.patch(
     '/me/avatar',
     requireRoleMiddleware(authFactory, [
-      'registered',
+      'user',
       'premium',
-      'moderator',
       'admin',
     ]),
     async (c) => {
@@ -98,9 +96,8 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
   routes.post(
     '/me/games',
     requireRoleMiddleware(authFactory, [
-      'registered',
+      'user',
       'premium',
-      'moderator',
       'admin',
     ]),
     async (c) => {
@@ -154,9 +151,8 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
   routes.delete(
     '/me/games/:gameId',
     requireRoleMiddleware(authFactory, [
-      'registered',
+      'user',
       'premium',
-      'moderator',
       'admin',
     ]),
     async (c) => {

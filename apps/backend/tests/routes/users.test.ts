@@ -94,7 +94,7 @@ describe('GET /api/users/me/avatar/upload-url', () => {
 
   it('returns uploadUrl and key with authentication', async () => {
     const app = createTestApp()
-    const { get } = await authedUser('registered')
+    const { get } = await authedUser('user')
     const res = await app.fetch(get('/api/users/me/avatar/upload-url'))
     expect(res.status).toBe(200)
     const body = (await res.json()) as { uploadUrl?: string, key?: string }
@@ -121,7 +121,7 @@ describe('PATCH /api/users/me/avatar', () => {
 
   it('updates user image and returns the new URL', async () => {
     const app = createTestApp()
-    const { req } = await authedUser('registered')
+    const { req } = await authedUser('user')
     const res = await app.fetch(
       req('PATCH', '/api/users/me/avatar', {
         key: 'avatars/u1/photo.jpg',
@@ -153,7 +153,7 @@ describe('POST /api/users/me/games', () => {
   it('returns 201 for a new game link', async () => {
     const app = createTestApp()
     await seedGame('game-1', 'Test Game')
-    const { req } = await authedUser('registered')
+    const { req } = await authedUser('user')
     const res = await app.fetch(
       req('POST', '/api/users/me/games', {
         gameId: 'game-1',
@@ -169,7 +169,7 @@ describe('POST /api/users/me/games', () => {
   it('returns 409 for duplicate game link', async () => {
     const app = createTestApp()
     await seedGame('game-1', 'Test Game')
-    const { req } = await authedUser('registered')
+    const { req } = await authedUser('user')
     // First insert
     await app.fetch(
       req('POST', '/api/users/me/games', {
@@ -206,7 +206,7 @@ describe('DELETE /api/users/me/games/:gameId', () => {
   it('returns 204 after deleting a linked game', async () => {
     const app = createTestApp()
     await seedGame('game-to-delete', 'Game To Delete')
-    const helper = await authedUser('registered')
+    const helper = await authedUser('user')
     // Add a game first
     await app.fetch(
       helper.req('POST', '/api/users/me/games', {
@@ -222,7 +222,7 @@ describe('DELETE /api/users/me/games/:gameId', () => {
 
   it('returns 404 for a non-existent game', async () => {
     const app = createTestApp()
-    const { req } = await authedUser('registered')
+    const { req } = await authedUser('user')
     const res = await app.fetch(
       req('DELETE', '/api/users/me/games/non-existent-game'),
     )

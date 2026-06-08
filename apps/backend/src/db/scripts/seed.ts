@@ -29,7 +29,7 @@ function findLocalD1Db(): string {
  *
  * Production D1:
  *   wrangler d1 execute map-project-db --remote \
- *     --command="INSERT OR IGNORE INTO role (name) VALUES ('registered'),('admin'),('premium'),('moderator')"
+ *     --command="INSERT OR IGNORE INTO role (name) VALUES ('user'),('premium'),('admin')"
  */
 export async function seedUserRoles() {
   const db = drizzle(createClient({ url: `file:${findLocalD1Db()}` }))
@@ -37,10 +37,8 @@ export async function seedUserRoles() {
   await db
     .insert(role)
     .values([
-      { name: 'visitor' },
-      { name: 'registered' },
+      { name: 'user' },
       { name: 'premium' },
-      { name: 'moderator' },
       { name: 'admin' },
     ])
     .onConflictDoNothing()

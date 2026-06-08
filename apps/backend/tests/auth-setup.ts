@@ -30,10 +30,7 @@ export async function createTestAuth() {
   // Seed the role table — the user.role FK references it.
   await db.insert(role).values([
     { name: 'user' },
-    { name: 'visitor' },
-    { name: 'registered' },
     { name: 'premium' },
-    { name: 'moderator' },
     { name: 'admin' },
   ])
 

@@ -78,7 +78,7 @@ describe("optionalAuth", () => {
   })
 
   it("sets user when valid bearer token is provided", async () => {
-    const { user, token } = await authedUser("registered")
+    const { user, token } = await authedUser("user")
 
     const app = new Hono<AppEnv>().get("/", testOptionalAuth(), (c) => {
       expect(c.var.user).not.toBeNull()
@@ -148,26 +148,26 @@ describe("requireRole", () => {
   })
 
   describe("when authenticated but role is not allowed", () => {
-    it("returns 403 for visitor on admin route", async () => {
+    it("returns 403 for premium on admin route", async () => {
       const app = new Hono<AppEnv>().get(
         "/admin",
         testRequireRole("admin"),
         (c) => c.json({ ok: true }),
       )
-      const { req } = await authedUser("visitor")
+      const { req } = await authedUser("premium")
       const res = await app.fetch(req("/admin"))
       expect(res.status).toBe(403)
       const body = await res.json() as { error: string }
       expect(body.error).toBe("Forbidden")
     })
 
-    it("returns 403 for registered on moderator route", async () => {
+    it("returns 403 for user on admin route", async () => {
       const app = new Hono<AppEnv>().get(
-        "/mod",
-        testRequireRole("moderator", "admin"),
+        "/admin",
+        testRequireRole("admin"),
         (c) => c.json({ ok: true }),
       )
-      const { req } = await authedUser("registered")
+      const { req } = await authedUser("user")
       const res = await app.fetch(req("/mod"))
       expect(res.status).toBe(403)
     })
@@ -185,21 +185,21 @@ describe("requireRole", () => {
       expect(res.status).toBe(200)
     })
 
-    it("allows moderator on mod-or-admin route", async () => {
+    it("allows premium on premium-or-admin route", async () => {
       const app = new Hono<AppEnv>().get(
-        "/mod",
-        testRequireRole("moderator", "admin"),
+        "/premium",
+        testRequireRole("premium", "admin"),
         (c) => c.json({ ok: true }),
       )
-      const { req } = await authedUser("moderator")
-      const res = await app.fetch(req("/mod"))
+      const { req } = await authedUser("premium")
+      const res = await app.fetch(req("/premium"))
       expect(res.status).toBe(200)
     })
 
-    it("allows premium on registered+premium route", async () => {
+    it("allows premium on user+premium route", async () => {
       const app = new Hono<AppEnv>().get(
         "/content",
-        testRequireRole("registered", "premium"),
+        testRequireRole("user", "premium"),
         (c) => c.json({ ok: true }),
       )
       const { req } = await authedUser("premium")
@@ -207,13 +207,13 @@ describe("requireRole", () => {
       expect(res.status).toBe(200)
     })
 
-    it("allows registered on registered+premium route", async () => {
+    it("allows user on user+premium route", async () => {
       const app = new Hono<AppEnv>().get(
         "/content",
-        testRequireRole("registered", "premium"),
+        testRequireRole("user", "premium"),
         (c) => c.json({ ok: true }),
       )
-      const { req } = await authedUser("registered")
+      const { req } = await authedUser("user")
       const res = await app.fetch(req("/content"))
       expect(res.status).toBe(200)
     })
