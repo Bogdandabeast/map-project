@@ -1,15 +1,21 @@
 import { IonButton, IonInput, IonItem, IonLabel, IonText } from '@ionic/react'
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import { signIn } from '../../lib/auth-client'
+import { useAuth } from '../../components/auth/AuthProvider'
 import { APP_URL } from '../../env'
 import { OAuthButtons } from '../../components/auth/OAuthButtons'
 
 export function LoginPage() {
+  const { isAuthenticated } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  if (isAuthenticated) {
+    return <Redirect to="/profile" />
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
