@@ -56,7 +56,7 @@ export function requireRoleMiddleware(
  *   const user = c.var.user // guaranteed non-null here
  * })
  *
- * app.get("/api/mod", requireRole("moderator", "admin"), (c) => {
+ * app.get("/api/mod", requireRole("premium", "admin"), (c) => {
  *   // …
  * })
  * ```
@@ -65,7 +65,7 @@ export function requireRole(...roles: string[]): MiddlewareHandler<AppEnv> {
   if (roles.length === 0) {
     throw new Error(
       'requireRole requires at least one role. ' +
-      'Usage: requireRole("admin") or requireRole("moderator", "admin")',
+      'Usage: requireRole("admin") or requireRole("premium", "admin")',
     )
   }
   return requireRoleMiddleware(createAuth, roles)

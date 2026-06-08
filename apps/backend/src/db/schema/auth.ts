@@ -22,7 +22,7 @@ export const user = sqliteTable("user", {
     .notNull(),
   role: text("role")
     .notNull()
-    .default("registered")
+    .default("user")
     .references(() => role.name, { onDelete: "restrict", onUpdate: "cascade" }),
   banned: integer("banned", { mode: "boolean" }).default(false).notNull(),
   banReason: text("ban_reason"),
