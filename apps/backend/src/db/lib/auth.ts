@@ -110,6 +110,7 @@ export function createAuth(env: BackendEnv & { DB: D1Database }) {
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
+    trustedOrigins: ['http://localhost:5173', 'capacitor://localhost'],
     user: {
       deleteUser: {
         enabled: true,

@@ -3,6 +3,7 @@ import { IonReactRouter } from '@ionic/react-router'
 import { Redirect, Route } from 'react-router-dom'
 
 import { AuthProvider } from './components/auth/AuthProvider'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { LoginPage } from './pages/Auth/LoginPage'
 import { SignupPage } from './pages/Auth/SignupPage'
 import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage'
@@ -34,7 +35,7 @@ const App: React.FC = () => (
     <AuthProvider>
       <IonReactRouter>
         <IonRouterOutlet>
-          {/* Auth pages */}
+          {/* Public — auth pages */}
           <Route exact path="/login">
             <LoginPage />
           </Route>
@@ -48,23 +49,21 @@ const App: React.FC = () => (
             <ResetPasswordPage />
           </Route>
 
-          {/* Profile pages */}
+          {/* Protected — requires session */}
           <Route exact path="/profile">
-            <MyProfilePage />
+            <ProtectedRoute><MyProfilePage /></ProtectedRoute>
           </Route>
           <Route exact path="/users/:id">
-            <PublicProfilePage />
+            <ProtectedRoute><PublicProfilePage /></ProtectedRoute>
           </Route>
           <Route exact path="/settings">
-            <SettingsPage />
+            <ProtectedRoute><SettingsPage /></ProtectedRoute>
           </Route>
-
-          {/* App pages */}
           <Route exact path="/map">
-            <MapPage />
+            <ProtectedRoute><MapPage /></ProtectedRoute>
           </Route>
           <Route exact path="/explore">
-            <ExplorePage />
+            <ProtectedRoute><ExplorePage /></ProtectedRoute>
           </Route>
 
           <Route exact path="/">
