@@ -1,5 +1,29 @@
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
+import {
+  IonApp,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonMenu,
+  IonMenuToggle,
+  IonRouterOutlet,
+  IonSplitPane,
+  IonTitle,
+  IonToolbar,
+  setupIonicReact,
+} from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
+import {
+  compassOutline,
+  logInOutline,
+  mapOutline,
+  personAddOutline,
+  personOutline,
+  searchOutline,
+  settingsOutline,
+} from 'ionicons/icons'
 import { Redirect, Route } from 'react-router-dom'
 
 import { AuthProvider } from './components/auth/AuthProvider'
@@ -30,46 +54,58 @@ import './theme/variables.css'
 
 setupIonicReact()
 
+const menuItems = [
+  { path: '/explore', icon: compassOutline, label: 'Explorar', auth: true },
+  { path: '/map', icon: mapOutline, label: 'Mapa', auth: true },
+  { path: '/profile', icon: personOutline, label: 'Perfil', auth: true },
+  { path: '/settings', icon: settingsOutline, label: 'Ajustes', auth: true },
+  { path: '/login', icon: logInOutline, label: 'Login', auth: false },
+  { path: '/signup', icon: personAddOutline, label: 'Registro', auth: false },
+  { path: '/forgot-password', icon: searchOutline, label: 'Reset Password', auth: false },
+]
+
 const App: React.FC = () => (
   <IonApp>
     <AuthProvider>
       <IonReactRouter>
-        <IonRouterOutlet>
-          {/* Public — auth pages */}
-          <Route exact path="/login">
-            <LoginPage />
-          </Route>
-          <Route exact path="/signup">
-            <SignupPage />
-          </Route>
-          <Route exact path="/forgot-password">
-            <ForgotPasswordPage />
-          </Route>
-          <Route exact path="/reset-password">
-            <ResetPasswordPage />
-          </Route>
+        <IonSplitPane contentId="main-content">
+          <IonMenu contentId="main-content" type="overlay">
+            <IonHeader>
+              <IonToolbar>
+                <IonTitle>Mesa Cerca</IonTitle>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent>
+              <IonList>
+                {menuItems.map(item => (
+                  <IonMenuToggle key={item.path} autoHide>
+                    <IonItem routerLink={item.path} routerDirection="none" lines="none" detail={false}>
+                      <IonIcon slot="start" icon={item.icon} />
+                      <IonLabel>{item.label}</IonLabel>
+                    </IonItem>
+                  </IonMenuToggle>
+                ))}
+              </IonList>
+            </IonContent>
+          </IonMenu>
 
-          {/* Protected — requires session */}
-          <Route exact path="/profile">
-            <ProtectedRoute><MyProfilePage /></ProtectedRoute>
-          </Route>
-          <Route exact path="/users/:id">
-            <ProtectedRoute><PublicProfilePage /></ProtectedRoute>
-          </Route>
-          <Route exact path="/settings">
-            <ProtectedRoute><SettingsPage /></ProtectedRoute>
-          </Route>
-          <Route exact path="/map">
-            <ProtectedRoute><MapPage /></ProtectedRoute>
-          </Route>
-          <Route exact path="/explore">
-            <ProtectedRoute><ExplorePage /></ProtectedRoute>
-          </Route>
+          <IonRouterOutlet id="main-content">
+            {/* Public — auth pages */}
+            <Route exact path="/login"><LoginPage /></Route>
+            <Route exact path="/signup"><SignupPage /></Route>
+            <Route exact path="/forgot-password"><ForgotPasswordPage /></Route>
+            <Route exact path="/reset-password"><ResetPasswordPage /></Route>
 
-          <Route exact path="/">
-            <Redirect to="/explore" />
-          </Route>
-        </IonRouterOutlet>
+            {/* Protected — requires session */}
+            <Route exact path="/profile"><ProtectedRoute><MyProfilePage /></ProtectedRoute></Route>
+            <Route exact path="/users/:id"><ProtectedRoute><PublicProfilePage /></ProtectedRoute></Route>
+            <Route exact path="/settings"><ProtectedRoute><SettingsPage /></ProtectedRoute></Route>
+            <Route exact path="/map"><ProtectedRoute><MapPage /></ProtectedRoute></Route>
+            <Route exact path="/explore"><ProtectedRoute><ExplorePage /></ProtectedRoute></Route>
+
+            <Route exact path="/"><Redirect to="/explore" /></Route>
+          </IonRouterOutlet>
+        </IonSplitPane>
       </IonReactRouter>
     </AuthProvider>
   </IonApp>
