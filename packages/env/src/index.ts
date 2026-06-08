@@ -37,10 +37,17 @@ export const backendEnvSchema = z.object({
 
 // ── Frontend: Vite-injected vars ──────────────────────────────
 export const frontendEnvSchema = z.object({
+  /** Backend API URL */
   VITE_API_URL: z
     .string()
     .url('VITE_API_URL must be a valid URL')
     .default('http://localhost:3000'),
+
+  /** Frontend app URL (used for OAuth redirects) */
+  VITE_APP_URL: z
+    .string()
+    .url('VITE_APP_URL must be a valid URL')
+    .default('http://localhost:5173'),
 })
 
 // ── Unified: every variable in the monorepo ───────────────────

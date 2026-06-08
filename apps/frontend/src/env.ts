@@ -9,5 +9,8 @@ import { parseFrontendEnv } from '@repo/env'
 
 export const env = parseFrontendEnv(import.meta.env as unknown as Record<string, unknown>)
 
-/** URL of the backend API. Guaranteed non-empty after validation. */
+/** URL of the backend API. */
 export const API_URL: string = env.VITE_API_URL
+
+/** URL of the frontend app (for OAuth redirects). */
+export const APP_URL: string = env.VITE_APP_URL
