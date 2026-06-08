@@ -1,17 +1,27 @@
 // ── Core (Better Auth) ──────────────────────────────────────────
-export { user, session, account, verification, role, jwks } from "./auth";
+export { account, jwks, role, session, user, verification } from './auth'
 
-// ── App tables ──────────────────────────────────────────────────
-export { userSettings } from "./user-settings";
-export { game } from "./game";
-export { userGames } from "./user-games";
-
+export {
+  eventAttendees,
+  eventAttendeesRelations,
+  events,
+  eventsRelations,
+  insertAttendeeSchema,
+  insertEventSchema,
+  selectAttendeeSchema,
+  selectEventSchema,
+} from './events-core'
+export { game } from './game'
 // ── Relations ───────────────────────────────────────────────────
 export {
-  userRelations,
-  sessionRelations,
   accountRelations,
-  userSettingsRelations,
   gameRelations,
+  sessionRelations,
   userGamesRelations,
-} from "./relations";
+  userRelations,
+  userSettingsRelations,
+} from './relations'
+export { userGames } from './user-games'
+
+// ── App tables ──────────────────────────────────────────────────
+export { userSettings } from './user-settings'

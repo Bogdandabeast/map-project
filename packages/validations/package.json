@@ -1,0 +1,12 @@
+{
+  "name": "@repo/validations",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./events": "./src/events.ts"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  }
+}
