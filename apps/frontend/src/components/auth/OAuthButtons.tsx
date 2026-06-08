@@ -2,20 +2,22 @@ import { IonButton } from '@ionic/react'
 import { signIn } from '../../lib/auth-client'
 import { APP_URL } from '../../env'
 
-export function OAuthButtons() {
-  const callback = `${APP_URL}/explore`
+interface OAuthButtonsProps {
+  callbackURL?: string
+}
 
+export function OAuthButtons({ callbackURL = `${APP_URL}/explore` }: OAuthButtonsProps) {
   return (
     <div>
       <IonButton
         expand="block"
-        onClick={() => signIn.social({ provider: 'google', callbackURL: callback })}
+        onClick={() => signIn.social({ provider: 'google', callbackURL })}
       >
         Google
       </IonButton>
       <IonButton
         expand="block"
-        onClick={() => signIn.social({ provider: 'github', callbackURL: callback })}
+        onClick={() => signIn.social({ provider: 'github', callbackURL })}
       >
         GitHub
       </IonButton>

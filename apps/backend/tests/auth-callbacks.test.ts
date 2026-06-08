@@ -2,7 +2,9 @@
  * Tests for Better Auth callback configuration: sendResetPassword and
  * deleteUser.enabled.
  *
- * RED phase: createAuth doesn't yet expose these options.
+ * createTestAuth (the test helper in auth-setup.ts) configures both
+ * sendResetPassword and deleteUser.enabled. The production createAuth
+ * also provides sendResetPassword via emailAndPassword.
  */
 import { describe, expect, it } from 'bun:test'
 import { createAuth } from '../src/db/lib/auth'
@@ -18,9 +20,8 @@ describe('Better Auth callbacks', () => {
     expect(emailOpts).toBeDefined()
     expect(emailOpts?.enabled).toBe(true)
 
-    // The sendResetPassword callback should be a function.
-    // In the test auth, it may be null/undefined since there's no real
-    // email service, but the production createAuth must define it.
+    // sendResetPassword is configured in the test auth and required
+    // in production — verify it's a defined function.
     expect(emailOpts?.sendResetPassword).toBeDefined()
     expect(typeof emailOpts?.sendResetPassword).toBe('function')
   })

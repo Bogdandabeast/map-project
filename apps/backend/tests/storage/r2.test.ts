@@ -1,8 +1,9 @@
 /**
  * Tests for R2 pre-signed URL helper.
  *
- * RED phase: src/storage/r2.ts doesn't exist yet — all tests will fail
- * on import or on first assertion.
+ * Asserts the expected behavior of createPresignedUrl: returns a URL-like
+ * string, includes the key, generates distinct URLs for different keys,
+ * and falls back gracefully when the R2 binding is absent.
  */
 import { describe, expect, it } from 'bun:test'
 import { createPresignedUrl } from '../../src/storage/r2'

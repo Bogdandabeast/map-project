@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { IonSpinner } from '@ionic/react';
 import MapView from '../components/map/view/MapView';
 import SearchBar from '../components/shared/SearchBar';
 import { Chip } from '../components/shared/Chip';
@@ -58,7 +59,7 @@ export function ExplorePage() {
         <div className="ui-overlay">
           <div className="auth-corner">
             {isPending ? (
-              <span className="auth-loading">…</span>
+              <IonSpinner className="auth-loading" />
             ) : isAuthenticated ? (
               <span className="auth-user">👤 {user?.name || user?.email}</span>
             ) : (

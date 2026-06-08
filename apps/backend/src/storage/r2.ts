@@ -14,6 +14,13 @@
 import type { R2UploadEnv } from '../types'
 
 /**
+ * Public R2 base URL for serving stored objects.
+ * Used both in presigned URL dev fallback and in the users route
+ * to build image URLs stored in the database.
+ */
+export const R2_PUBLIC_BASE_URL = 'https://r2.dev/mesa-cerca'
+
+/**
  * Generate a pre-signed URL for uploading an object to R2.
  *
  * When the R2 binding IS available, constructs an S3-compatible PUT
@@ -33,7 +40,7 @@ export async function createPresignedUrl(
     // Dev/test fallback: return a placeholder URL that contains the key.
     // Real pre-signed URLs require S3 API credentials which are only
     // available in the Cloudflare Workers environment.
-    return `https://r2.dev/mesa-cerca/${key}?expires=${Date.now() + expiresInSeconds * 1000}`
+    return `${R2_PUBLIC_BASE_URL}/${key}?expires=${Date.now() + expiresInSeconds * 1000}`
   }
 
   // Production: R2 is available. Cloudflare Workers R2 supports S3-compatible APIs.
