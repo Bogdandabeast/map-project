@@ -14,6 +14,7 @@
     "@repo/types": "workspace:*",
     "better-auth": "^1.6.14",
     "drizzle-orm": "^0.45.2",
+    "drizzle-zod": "^0.8.3",
     "hono": "^4.12.23",
     "kysely": "0.28.17",
     "zod": "^4.4.3"
@@ -21,7 +22,9 @@
   "devDependencies": {
     "@better-auth/cli": "^1.4.21",
     "@libsql/client": "^0.17.3",
+    "@vitest/coverage-v8": "^4.1.8",
     "drizzle-kit": "^0.31.10",
+    "vitest": "^4.1.8",
     "wrangler": "^4.4.0"
   }
 }
