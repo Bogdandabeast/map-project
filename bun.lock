@@ -21,10 +21,12 @@
       "name": "backend",
       "dependencies": {
         "@better-auth/drizzle-adapter": "^1.6.14",
+        "@repo/env": "workspace:*",
         "better-auth": "^1.6.14",
         "drizzle-orm": "^0.45.2",
         "hono": "^4.12.23",
         "kysely": "0.28.17",
+        "zod": "^4.4.3",
       },
       "devDependencies": {
         "@better-auth/cli": "^1.4.21",
@@ -44,6 +46,7 @@
         "@capacitor/status-bar": "8.0.2",
         "@ionic/react": "^8.5.0",
         "@ionic/react-router": "^8.5.0",
+        "@repo/env": "workspace:*",
         "better-auth": "^1.6.14",
         "ionicons": "^7.4.0",
         "ol": "^10.8.0",
@@ -70,6 +73,13 @@
         "terser": "^5.4.0",
         "typescript": "~5.9.0",
         "vite": "^5.0.0",
+      },
+    },
+    "packages/env": {
+      "name": "@repo/env",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "^4.4.3",
       },
     },
     "packages/eslint-config": {
@@ -701,6 +711,8 @@
     "@poppinss/exception": ["@poppinss/exception@1.2.3", "", {}, "sha512-dCED+QRChTVatE9ibtoaxc+WkdzOSjYTKi/+uacHWIsfodVfpsueo3+DKpgU5Px8qXjgmXkSvhXvSCz3fnP9lw=="],
 
     "@prisma/client": ["@prisma/client@5.22.0", "", { "peerDependencies": { "prisma": "*" }, "optionalPeers": ["prisma"] }, "sha512-M0SVXfyHnQREBKxCgyo7sffrKttwE6R8PMq330MIUF0pTwjUhLbW84pFDlf06B27XyCR++VtjugEnIHdr07SVA=="],
+
+    "@repo/env": ["@repo/env@workspace:packages/env"],
 
     "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
 
