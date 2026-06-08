@@ -1,0 +1,14 @@
+{
+  "name": "@repo/types",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./users": "./src/users.ts",
+    "./map": "./src/map.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

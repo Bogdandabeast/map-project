@@ -21,6 +21,7 @@
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
     "@repo/env": "workspace:*",
+    "@repo/types": "workspace:*",
     "better-auth": "^1.6.14",
     "ionicons": "^7.4.0",
     "ol": "^10.8.0",

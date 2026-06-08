@@ -1,4 +1,5 @@
 import { API_URL } from '../env'
+import type { AvatarUploadUrlResponse, PublicProfile } from '@repo/types/users'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
@@ -20,11 +21,6 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   return response.json() as Promise<T>
-}
-
-export interface AvatarUploadUrlResponse {
-  uploadUrl: string
-  key: string
 }
 
 export async function getAvatarUploadUrl(): Promise<AvatarUploadUrlResponse> {
@@ -55,13 +51,6 @@ export async function removeGame(gameId: string): Promise<void> {
   return request<void>(`/api/users/me/games/${gameId}`, {
     method: 'DELETE',
   })
-}
-
-export interface PublicProfile {
-  id: string
-  name: string
-  image: string | null
-  games: string[]
 }
 
 export async function getPublicProfile(userId: string): Promise<PublicProfile> {

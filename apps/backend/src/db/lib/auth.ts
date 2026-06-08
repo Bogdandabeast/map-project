@@ -139,10 +139,4 @@ export function createAuth(env: BackendEnv & { DB: D1Database }) {
   })
 }
 
-/**
- * Factory signature for creating an auth instance from environment.
- * The default implementation is `createAuth`; tests inject a
- * libsql-backed alternative via the middleware test helpers.
- */
-type CreateAuthEnv = Parameters<typeof createAuth>[0]
-export type AuthFactory = (env: CreateAuthEnv) => ReturnType<typeof createAuth>
+export type { AuthFactory } from '../../types/auth'
