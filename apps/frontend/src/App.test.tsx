@@ -10,5 +10,6 @@ mock.module('./components/map/view/MapView', () => ({
 it('renders the app shell', () => {
   const { getByTestId } = render(<App />)
 
+  // App redirects / → /explore, ExplorePage renders MapView mock
   expect(getByTestId('map-mock')).toBeTruthy()
 })

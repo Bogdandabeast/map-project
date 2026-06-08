@@ -39,10 +39,16 @@ if (globalThis.document && !('dir' in globalThis.document)) {
   })
 }
 
-// Ensure CSSStyleSheet etc. are polyfilled
+// Patch CSSStyleSheet.prototype.replaceSync to not crash when Ionic
+// creates ad-hoc instances that lack internal happy-dom wiring.
 try {
-  if (!globalThis.CSSStyleSheet) {
-    (globalThis as any).CSSStyleSheet = class CSSStyleSheet {}
+  const proto = (globalThis as any).CSSStyleSheet?.prototype
+  if (proto) {
+    const origReplaceSync = proto.replaceSync
+    proto.replaceSync = function (cssText: string | undefined) {
+      if (cssText === undefined || cssText === null) return
+      return origReplaceSync.call(this, cssText)
+    }
   }
 }
 catch {
