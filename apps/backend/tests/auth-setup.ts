@@ -76,7 +76,7 @@ export async function createTestAuth() {
   return {
     auth,
     db,
-    test: (ctx as unknown as { test: TestHelpers }).test,
+    test: (ctx as { test: TestHelpers }).test,
   }
 }
 

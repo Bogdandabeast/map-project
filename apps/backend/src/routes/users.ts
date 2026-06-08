@@ -1,3 +1,9 @@
+import type {
+  AvatarKeyBody,
+  LinkGameBody,
+  UserRoutesOptions,
+} from '../types'
+import type { AppEnv } from '../types/hono'
 import { and, count, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createAuth } from '../db/lib/auth'
@@ -7,14 +13,6 @@ import { userGames } from '../db/schema/user-games'
 import { optionalAuthMiddleware } from '../middlewares/optionalAuth'
 import { requireRoleMiddleware } from '../middlewares/requireRole'
 import { createPresignedUrl } from '../storage/r2'
-import type { AppEnv } from '../types/hono'
-import type {
-  AnyDrizzleDb,
-  AvatarKeyBody,
-  LinkGameBody,
-  UserRoutesOptions,
-} from '../types'
-import type { AuthFactory } from '../types/auth'
 
 export function createUserRoutes(options: UserRoutesOptions = {}) {
   const authFactory = options.authFactory ?? createAuth
@@ -33,7 +31,8 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
     ]),
     async (c) => {
       const currentUser = c.var.user!
-      const key = `avatars/${currentUser.id}/${Date.now()}.jpg`
+      const ext = c.req.query('ext') || 'jpg'
+      const key = `avatars/${currentUser.id}/${Date.now()}.${ext}`
 
       // In tests c.env may be undefined; guard with a fallback
       const r2Binding = (c.env as Record<string, unknown> | undefined)?.R2 as

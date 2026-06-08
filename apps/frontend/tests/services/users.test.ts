@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, mock } from 'bun:test'
 
-// RED — the users service does not exist yet
 import {
   addGame,
   confirmAvatar,

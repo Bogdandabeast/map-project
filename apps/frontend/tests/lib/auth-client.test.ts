@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'bun:test'
 
-// RED — importing from a module that does not exist yet
 import {
   deleteUser,
   forgotPassword,
@@ -59,7 +58,7 @@ describe('auth-client', () => {
   })
 
   it('all exports are distinct references', () => {
-    const exports = [signIn, signUp, signOut, useSession, updateUser, deleteUser, forgotPassword, resetPassword]
+    const exports = [signIn, signIn.social, signUp, signOut, useSession, updateUser, deleteUser, forgotPassword, resetPassword]
     const unique = new Set(exports)
     expect(unique.size).toBe(exports.length)
   })

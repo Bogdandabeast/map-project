@@ -23,7 +23,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    return <Redirect to="/login" />
+    return <Redirect to="/explore" />
   }
 
   return <>{children}</>

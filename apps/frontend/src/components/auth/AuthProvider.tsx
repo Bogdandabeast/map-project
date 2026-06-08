@@ -1,5 +1,6 @@
+import type { Session, User } from 'better-auth'
 import type { ReactNode } from 'react'
-import { IonSpinner } from '@ionic/react'
+import { IonSpinner, IonText } from '@ionic/react'
 import { createContext, useContext } from 'react'
 import { useSession } from '../../lib/auth-client'
 
@@ -7,8 +8,8 @@ import { useSession } from '../../lib/auth-client'
    AuthProvider and useAuth are a cohesive unit; splitting adds indirection */
 
 interface AuthContextType {
-  session: Record<string, any> | null
-  user: Record<string, any> | null
+  session: Session | null
+  user: User | null
   isPending: boolean
   isAuthenticated: boolean
 }
@@ -16,9 +17,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending } = useSession()
+  const { data: session, isPending, error } = useSession()
   const user = session?.user ?? null
   const isAuthenticated = !!user
+
+  if (error) {
+    return (
+      <div
+        data-testid="auth-error"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
+        <IonText color="danger">
+          <p>Authentication error. Please try again later.</p>
+        </IonText>
+      </div>
+    )
+  }
 
   if (isPending) {
     return (
