@@ -12,7 +12,7 @@ import { user } from '../db/schema/auth'
 import { userGames } from '../db/schema/user-games'
 import { optionalAuthMiddleware } from '../middlewares/optionalAuth'
 import { requireRoleMiddleware } from '../middlewares/requireRole'
-import { createPresignedUrl } from '../storage/r2'
+import { createPresignedUrl, R2_PUBLIC_BASE_URL } from '../storage/r2'
 
 export function createUserRoutes(options: UserRoutesOptions = {}) {
   const authFactory = options.authFactory ?? createAuth
@@ -31,16 +31,24 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
     ]),
     async (c) => {
       const currentUser = c.var.user!
-      const ext = c.req.query('ext') || 'jpg'
-      const key = `avatars/${currentUser.id}/${Date.now()}.${ext}`
+      const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif']
+      const rawExt = (c.req.query('ext') || 'jpg').toLowerCase().replace(/^\./, '')
+      if (!ALLOWED_EXTS.includes(rawExt)) {
+        return c.json({ error: `Invalid extension '${rawExt}'. Allowed: ${ALLOWED_EXTS.join(', ')}` }, 400)
+      }
+      const key = `avatars/${currentUser.id}/${Date.now()}.${rawExt}`
 
       // In tests c.env may be undefined; guard with a fallback
-      const r2Binding = (c.env as Record<string, unknown> | undefined)?.R2 as
-        | R2Bucket
-        | undefined
+      const rawEnv = c.env as Record<string, unknown> | undefined
 
       const url = await createPresignedUrl(
-        { R2: r2Binding },
+        {
+          R2: rawEnv?.R2 as R2Bucket | undefined,
+          s3AccessKeyId: rawEnv?.R2_S3_ACCESS_KEY_ID as string | undefined,
+          s3SecretAccessKey: rawEnv?.R2_S3_SECRET_ACCESS_KEY as string | undefined,
+          s3BucketName: rawEnv?.R2_S3_BUCKET_NAME as string | undefined,
+          s3AccountId: rawEnv?.R2_ACCOUNT_ID as string | undefined,
+        },
         key,
         3600,
       )
@@ -66,7 +74,7 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
       }
 
       const db = getDb(c.env)
-      const imageUrl = `https://r2.dev/mesa-cerca/${body.key}`
+      const imageUrl = `${R2_PUBLIC_BASE_URL}/${body.key}`
 
       await db
         .update(user)

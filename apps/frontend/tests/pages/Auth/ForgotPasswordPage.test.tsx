@@ -1,7 +1,12 @@
+/* eslint-disable react/component-hook-factories --
+   Mock module factories use hook-like method names to match Better Auth API */
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, mock } from 'bun:test'
 import * as React from 'react'
 import { MemoryRouter, Route } from 'react-router-dom'
+
+import { ForgotPasswordPage } from '../../../src/pages/Auth/ForgotPasswordPage'
 
 let mockForgotPassword: (...args: any[]) => Promise<{ error?: { message: string } }> = async () => ({})
 
@@ -24,8 +29,6 @@ mock.module('../../../src/env', () => ({
   API_URL: 'http://localhost:8787',
   APP_URL: 'http://localhost:5173',
 }))
-
-import { ForgotPasswordPage } from '../../../src/pages/Auth/ForgotPasswordPage'
 
 describe('ForgotPasswordPage', () => {
   afterEach(() => {
@@ -67,7 +70,10 @@ describe('ForgotPasswordPage', () => {
     try {
       (el as any).value = email
     }
-    catch { /* ignore */ }
+    catch {
+      // IonInput may not expose .value directly in the test DOM;
+      // the ionChange event below is the actual trigger. Ignore silently.
+    }
     fireEvent(el, new CustomEvent('ionChange', {
       detail: { value: email },
       bubbles: true,
@@ -126,7 +132,9 @@ describe('ForgotPasswordPage', () => {
 
   it('shows loading state while submitting', async () => {
     let resolvePromise!: (value: any) => void
-    mockForgotPassword = () => new Promise((resolve) => { resolvePromise = resolve })
+    mockForgotPassword = () => new Promise((resolve) => {
+      resolvePromise = resolve
+    })
 
     renderPage()
     fillEmail('user@example.com')

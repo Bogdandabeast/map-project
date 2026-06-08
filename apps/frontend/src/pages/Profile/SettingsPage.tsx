@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   IonButton,
   IonContent,
@@ -10,7 +9,9 @@ import {
   IonSelectOption,
   IonText,
 } from '@ionic/react'
+import { useState } from 'react'
 import { ProtectedRoute } from '../../components/auth/ProtectedRoute'
+import { APP_URL } from '../../env'
 import { deleteUser } from '../../lib/auth-client'
 
 export function SettingsPage() {
@@ -35,7 +36,7 @@ function SettingsContent() {
     await deleteUser({
       fetchOptions: {
         onSuccess: () => {
-          window.location.href = '/login'
+          window.location.href = `${APP_URL}/login`
         },
       },
     })

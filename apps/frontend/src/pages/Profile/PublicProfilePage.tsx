@@ -1,8 +1,8 @@
+import type { PublicProfile } from '@repo/types'
 import { IonAvatar, IonContent, IonPage, IonSpinner, IonText } from '@ionic/react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getPublicProfile } from '../../services/users'
-import type { PublicProfile } from '@repo/types'
 
 export function PublicProfilePage() {
   const { id } = useParams<{ id: string }>()
@@ -10,7 +10,12 @@ export function PublicProfilePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!id) return
+    if (!id)
+      return
+
+    // Reset state so previous profile isn't shown while loading the new one
+    setLoading(true)
+    setProfile(null)
 
     let cancelled = false
 
@@ -78,32 +83,34 @@ export function PublicProfilePage() {
     <IonPage>
       <IonContent>
         <div style={{ padding: '1rem', maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
-          {profile.image ? (
-            <IonAvatar
-              data-testid="public-avatar"
-              style={{ margin: '0 auto', width: '96px', height: '96px' }}
-            >
-              <img src={profile.image} alt={profile.name} />
-            </IonAvatar>
-          ) : (
-            <div
-              data-testid="public-avatar-placeholder"
-              style={{
-                width: '96px',
-                height: '96px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--ion-color-medium)',
-                margin: '0 auto',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: 'white',
-              }}
-            >
-              {profile.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          {profile.image
+            ? (
+                <IonAvatar
+                  data-testid="public-avatar"
+                  style={{ margin: '0 auto', width: '96px', height: '96px' }}
+                >
+                  <img src={profile.image} alt={profile.name} />
+                </IonAvatar>
+              )
+            : (
+                <div
+                  data-testid="public-avatar-placeholder"
+                  style={{
+                    width: '96px',
+                    height: '96px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--ion-color-medium)',
+                    margin: '0 auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2rem',
+                    color: 'white',
+                  }}
+                >
+                  {profile.name.charAt(0).toUpperCase()}
+                </div>
+              )}
 
           <h1 data-testid="public-name">{profile.name}</h1>
 

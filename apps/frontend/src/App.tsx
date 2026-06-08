@@ -28,15 +28,15 @@ import { Redirect, Route } from 'react-router-dom'
 
 import { AuthProvider } from './components/auth/AuthProvider'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
-import { LoginPage } from './pages/Auth/LoginPage'
-import { SignupPage } from './pages/Auth/SignupPage'
 import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage'
+import { LoginPage } from './pages/Auth/LoginPage'
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage'
+import { SignupPage } from './pages/Auth/SignupPage'
+import { ExplorePage } from './pages/ExplorePage'
+import { MapPage } from './pages/MapPage'
 import { MyProfilePage } from './pages/Profile/MyProfilePage'
 import { PublicProfilePage } from './pages/Profile/PublicProfilePage'
 import { SettingsPage } from './pages/Profile/SettingsPage'
-import { MapPage } from './pages/MapPage'
-import { ExplorePage } from './pages/ExplorePage'
 
 import '@ionic/react/css/core.css'
 import '@ionic/react/css/normalize.css'
@@ -98,7 +98,7 @@ const App: React.FC = () => (
 
             {/* Protected — requires session */}
             <Route exact path="/profile"><ProtectedRoute><MyProfilePage /></ProtectedRoute></Route>
-            <Route exact path="/users/:id"><ProtectedRoute><PublicProfilePage /></ProtectedRoute></Route>
+            <Route exact path="/users/:id"><PublicProfilePage /></Route>
             <Route exact path="/settings"><ProtectedRoute><SettingsPage /></ProtectedRoute></Route>
             <Route exact path="/map"><ProtectedRoute><MapPage /></ProtectedRoute></Route>
             <Route exact path="/explore"><ProtectedRoute><ExplorePage /></ProtectedRoute></Route>

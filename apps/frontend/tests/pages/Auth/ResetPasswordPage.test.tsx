@@ -1,7 +1,12 @@
+/* eslint-disable react/component-hook-factories --
+   Mock module factories use hook-like method names to match Better Auth API */
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, mock } from 'bun:test'
 import * as React from 'react'
 import { MemoryRouter, Route } from 'react-router-dom'
+
+import { ResetPasswordPage } from '../../../src/pages/Auth/ResetPasswordPage'
 
 let mockResetPassword: (...args: any[]) => Promise<{ error?: { message: string } }> = async () => ({})
 
@@ -15,17 +20,13 @@ mock.module('../../../src/lib/auth-client', () => ({
   updateUser: {},
   deleteUser: {},
   forgotPassword: {},
-  resetPassword: {
-    email: (...args: any[]) => mockResetPassword(...args),
-  },
+  resetPassword: (...args: any[]) => mockResetPassword(...args),
 }))
 
 mock.module('../../../src/env', () => ({
   API_URL: 'http://localhost:8787',
   APP_URL: 'http://localhost:5173',
 }))
-
-import { ResetPasswordPage } from '../../../src/pages/Auth/ResetPasswordPage'
 
 describe('ResetPasswordPage', () => {
   afterEach(() => {
@@ -82,7 +83,7 @@ describe('ResetPasswordPage', () => {
   }
 
   it('calls resetPassword with token and new password on submit', async () => {
-    const spy = mock(async (_params: { token: string; newPassword: string }) => ({}))
+    const spy = mock(async (_params: { token: string, newPassword: string }) => ({}))
     mockResetPassword = spy as any
 
     renderPage('abc123')
@@ -92,13 +93,8 @@ describe('ResetPasswordPage', () => {
     fireEvent.submit(form)
 
     await waitFor(() => {
-      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith({ token: 'abc123', newPassword: 'newSecurePass1' })
     })
-
-    // resetPassword expects token and newPassword
-    const callArgs = spy.mock.calls[0]?.[0] as any
-    expect(callArgs.token).toBe('abc123')
-    expect(callArgs.newPassword).toBe('newSecurePass1')
   })
 
   it('shows error on reset failure', async () => {

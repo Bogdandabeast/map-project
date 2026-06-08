@@ -1,7 +1,7 @@
-import { API_URL } from '../env'
 import type { AvatarUploadUrlResponse, PublicProfile } from '@repo/types/users'
+import { API_URL } from '../env'
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function request<T>(path: string, options: RequestInit & { expectNoContent?: boolean } = {}): Promise<T> {
   const { headers: optHeaders, ...rest } = options
   const headers: Record<string, string> = {
     ...(optHeaders instanceof Headers
@@ -22,7 +22,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   if (response.status === 204) {
-    return undefined as T
+    if (!options.expectNoContent) {
+      console.warn('Received 204 but expectNoContent not set')
+    }
+    return undefined as unknown as T
   }
 
   return response.json() as Promise<T>
@@ -38,6 +41,7 @@ export async function confirmAvatar(key: string): Promise<void> {
   return request<void>('/api/users/me/avatar', {
     method: 'PATCH',
     body: JSON.stringify({ key }),
+    expectNoContent: true,
   })
 }
 
@@ -49,15 +53,17 @@ export async function addGame(gameId: string, skillLevel?: string): Promise<void
   return request<void>('/api/users/me/games', {
     method: 'POST',
     body: JSON.stringify(body),
+    expectNoContent: true,
   })
 }
 
 export async function removeGame(gameId: string): Promise<void> {
-  return request<void>(`/api/users/me/games/${gameId}`, {
+  return request<void>(`/api/users/me/games/${encodeURIComponent(gameId)}`, {
     method: 'DELETE',
+    expectNoContent: true,
   })
 }
 
 export async function getPublicProfile(userId: string): Promise<PublicProfile> {
-  return request<PublicProfile>(`/api/users/${userId}`)
+  return request<PublicProfile>(`/api/users/${encodeURIComponent(userId)}`)
 }

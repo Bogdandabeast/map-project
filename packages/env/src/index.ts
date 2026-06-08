@@ -19,6 +19,12 @@ const betterAuthVars = {
     .string()
     .url('BETTER_AUTH_URL must be a valid URL')
     .default('http://localhost:3000'),
+
+  /** Comma-separated list of allowed origins for CORS/cookies. */
+  TRUSTED_ORIGINS: z
+    .string()
+    .optional()
+    .default(''),
 }
 
 // ── Backend: OAuth providers ──────────────────────────────────
@@ -43,11 +49,10 @@ export const frontendEnvSchema = z.object({
     .url('VITE_API_URL must be a valid URL')
     .default('http://localhost:3000'),
 
-  /** Frontend app URL (used for OAuth redirects) */
+  /** Frontend app URL (used for OAuth redirects) — required, no default */
   VITE_APP_URL: z
     .string()
-    .url('VITE_APP_URL must be a valid URL')
-    .default('http://localhost:5173'),
+    .url('VITE_APP_URL must be a valid URL'),
 })
 
 // ── Unified: every variable in the monorepo ───────────────────

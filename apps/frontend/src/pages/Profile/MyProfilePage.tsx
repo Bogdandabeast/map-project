@@ -1,8 +1,8 @@
 import { IonButton, IonContent, IonPage, IonText } from '@ionic/react'
 import { useAuth } from '../../components/auth/AuthProvider'
 import { ProtectedRoute } from '../../components/auth/ProtectedRoute'
-import { signOut } from '../../lib/auth-client'
 import { APP_URL } from '../../env'
+import { signOut } from '../../lib/auth-client'
 
 export function MyProfilePage() {
   return (
@@ -62,7 +62,7 @@ function MyProfileContent() {
           <p>
             <strong>Rol:</strong>
             {' '}
-            <span data-testid="profile-role">{(user as any).role || 'user'}</span>
+            <span data-testid="profile-role">{(user as { role?: string }).role || 'user'}</span>
           </p>
         </IonText>
       </div>
