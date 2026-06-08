@@ -2,6 +2,9 @@
 
 // ── Users API ──────────────────────────────────────────────────
 
+/** Application role names — must match the role table seeds. */
+export type UserRole = 'admin' | 'premium' | 'user'
+
 /** POST /api/users/me/avatar/upload-url */
 export interface AvatarUploadUrlResponse {
   uploadUrl: string
@@ -13,6 +16,6 @@ export interface PublicProfile {
   id: string
   name: string
   image: string | null
-  role: string
+  role: UserRole
   gameCount: number
 }

@@ -3,9 +3,6 @@ import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { resetPassword } from '../../lib/auth-client'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const resetPasswordEmail = (resetPassword as any).email as (params: { token: string; newPassword: string }) => Promise<{ error?: { message: string } }>
-
 export function ResetPasswordPage() {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
@@ -17,13 +14,14 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token) return
+    if (!token)
+      return
 
     setErrorMessage('')
     setIsLoading(true)
 
     try {
-      const result = await resetPasswordEmail({
+      const result = await resetPassword({
         token,
         newPassword: password,
       })

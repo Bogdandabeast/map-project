@@ -37,14 +37,31 @@ describe('Better Auth callbacks', () => {
     expect(deleteUser?.enabled).toBe(true)
   })
 
-  it('production createAuth has sendResetPassword callback', () => {
-    // Test the production factory indirectly — verify it doesn't throw
-    // when the env is passed. The sendResetPassword is set in the config.
-    // We can't call createAuth() without a real D1 binding in Node.js,
-    // but we can verify the exported symbol shape.
-    expect(typeof createAuth).toBe('function')
+  it('production createAuth configures sendResetPassword callback', () => {
+    // Mock a minimal D1 binding so we can call createAuth and inspect
+    // the returned auth config. D1's prepare() returns a statement with
+    // a .all() stub — enough to let better-auth initialise without I/O.
+    const mockD1 = {
+      prepare: () => ({
+        all: async () => ({ results: [] }),
+        first: async () => null,
+        run: async () => ({ success: true }),
+        raw: async () => [],
+      }),
+    } as unknown as D1Database
 
-    // The factory should accept env with DB binding
-    expect(createAuth.length).toBe(1) // one parameter (env)
+    const auth = createAuth({
+      BETTER_AUTH_SECRET: 'test-secret-32-chars-test-secret-32-c',
+      BETTER_AUTH_URL: 'http://localhost:3000',
+      GITHUB_CLIENT_ID: '',
+      GITHUB_CLIENT_SECRET: '',
+      GOOGLE_CLIENT_ID: '',
+      GOOGLE_CLIENT_SECRET: '',
+      DB: mockD1,
+    })
+
+    const emailOpts = auth.options.emailAndPassword
+    expect(emailOpts).toBeDefined()
+    expect(emailOpts?.sendResetPassword).toBeInstanceOf(Function)
   })
 })

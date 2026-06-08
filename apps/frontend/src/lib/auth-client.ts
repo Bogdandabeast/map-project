@@ -12,5 +12,7 @@ export const {
   resetPassword,
 } = createAuthClient({
   baseURL: API_URL,
-  credentials: 'include',
+  fetchOptions: {
+    credentials: 'include',
+  },
 })

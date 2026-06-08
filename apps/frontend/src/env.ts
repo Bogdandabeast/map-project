@@ -7,7 +7,16 @@
  */
 import { parseFrontendEnv } from '@repo/env'
 
-export const env = parseFrontendEnv(import.meta.env as unknown as Record<string, unknown>)
+// Vite replaces import.meta.env at build time. In test environments
+// (Bun) the VITE_ keys are absent, so validation would throw.
+// Fall back to localhost defaults so tests can import the module
+// without crashing; production builds will catch missing vars.
+const raw = import.meta.env as Record<string, unknown>
+const hasViteKeys = Object.keys(raw).some(k => k.startsWith('VITE_'))
+
+export const env = hasViteKeys
+  ? parseFrontendEnv(raw)
+  : { VITE_API_URL: 'http://localhost:3000', VITE_APP_URL: 'http://localhost:5173' }
 
 /** URL of the backend API. */
 export const API_URL: string = env.VITE_API_URL

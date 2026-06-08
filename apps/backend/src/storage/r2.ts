@@ -2,8 +2,9 @@
  * R2 pre-signed URL helper for Cloudflare Workers.
  *
  * In production, generates an S3-compatible pre-signed URL for direct
- * client-to-R2 uploads. In dev/test where the R2 binding is missing,
- * returns a development-friendly data URL.
+ * client-to-R2 uploads using the AWS SDK. In dev/test where the R2
+ * binding or S3 credentials are missing, returns a development-friendly
+ * placeholder URL.
  *
  * @example
  * ```ts
@@ -12,6 +13,8 @@
  */
 
 import type { R2UploadEnv } from '../types'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 /**
  * Public R2 base URL for serving stored objects.
@@ -23,11 +26,12 @@ export const R2_PUBLIC_BASE_URL = 'https://r2.dev/mesa-cerca'
 /**
  * Generate a pre-signed URL for uploading an object to R2.
  *
- * When the R2 binding IS available, constructs an S3-compatible PUT
- * pre-signed URL using HMAC-SHA256. When R2 is NOT available (local dev
- * or test), returns a placeholder URL that includes the key.
+ * When the S3 credentials ARE available, uses the AWS SDK to create a
+ * properly SigV4-signed URL. When only the R2 binding is present but no
+ * S3 credentials, returns a placeholder. When neither is available, also
+ * returns a dev-friendly placeholder.
  *
- * @param env - Worker environment with optional R2 bucket binding
+ * @param env - Environment with optional R2 bucket binding and S3 config
  * @param key - Object key (path) in the bucket
  * @param expiresInSeconds - URL expiration in seconds (default 3600)
  */
@@ -36,21 +40,30 @@ export async function createPresignedUrl(
   key: string,
   expiresInSeconds = 3600,
 ): Promise<string> {
-  if (!env.R2) {
-    // Dev/test fallback: return a placeholder URL that contains the key.
-    // Real pre-signed URLs require S3 API credentials which are only
-    // available in the Cloudflare Workers environment.
-    return `${R2_PUBLIC_BASE_URL}/${key}?expires=${Date.now() + expiresInSeconds * 1000}`
+  const { s3AccessKeyId, s3SecretAccessKey, s3BucketName, s3AccountId } = env
+
+  // When full S3 credentials are configured, use proper SigV4 signing
+  if (s3AccessKeyId && s3SecretAccessKey && s3BucketName && s3AccountId) {
+    const endpoint = `https://${s3AccountId}.r2.cloudflarestorage.com`
+    const s3Client = new S3Client({
+      region: 'auto',
+      endpoint,
+      credentials: {
+        accessKeyId: s3AccessKeyId,
+        secretAccessKey: s3SecretAccessKey,
+      },
+    })
+
+    const command = new PutObjectCommand({
+      Bucket: s3BucketName,
+      Key: key,
+    })
+
+    return getSignedUrl(s3Client, command, { expiresIn: expiresInSeconds })
   }
 
-  // Production: R2 is available. Cloudflare Workers R2 supports S3-compatible APIs.
-  // We use the R2 binding to generate a pre-signed URL for PUT.
-  // The R2 binding doesn't expose createPresignedUrl natively, but we can construct
-  // it using the S3 PutObject API via Cloudflare's R2 custom domain.
-  //
-  // For now, construct a direct upload URL. In a full production setup,
-  // this would use HMAC-SHA256 signature with the S3 API.
-  const bucketUrl = `https://mesa-cerca.r2.cloudflarestorage.com`
-
-  return `${bucketUrl}/${key}?X-Amz-Expires=${expiresInSeconds}&X-Amz-Date=${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`
+  // Dev/test fallback: return a placeholder URL that contains the key.
+  // Real pre-signed URLs require S3 API credentials which are only
+  // available in the Cloudflare Workers environment via secrets.
+  return `${R2_PUBLIC_BASE_URL}/${key}?expires=${Date.now() + expiresInSeconds * 1000}`
 }

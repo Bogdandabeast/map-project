@@ -1,7 +1,13 @@
+/* eslint-disable react/component-hook-factories --
+   Mock module factories use hook-like method names to match Better Auth API */
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { afterEach, beforeAll, describe, expect, it, mock } from 'bun:test'
+import { afterAll, afterEach, beforeAll, describe, expect, it, mock } from 'bun:test'
 import * as React from 'react'
 import { MemoryRouter, Route } from 'react-router-dom'
+
+import { AuthProvider } from '../../../src/components/auth/AuthProvider'
+import { SettingsPage } from '../../../src/pages/Profile/SettingsPage'
 
 let mockSession: { data: any, isPending: boolean, error: any } = {
   data: null,
@@ -28,9 +34,6 @@ mock.module('../../../src/env', () => ({
   APP_URL: 'http://localhost:5173',
 }))
 
-import { AuthProvider } from '../../../src/components/auth/AuthProvider'
-import { SettingsPage } from '../../../src/pages/Profile/SettingsPage'
-
 describe('SettingsPage', () => {
   afterEach(() => {
     mockSession = { data: null, isPending: false, error: null }
@@ -52,10 +55,14 @@ describe('SettingsPage', () => {
     )
   }
 
-  // Suppress console errors during IonAlert tests (CSSStyleSheet compatibility)
+  // Suppress console errors during IonAlert tests (CSSStyleSheet compatibility).
+  // Restored in afterAll to avoid contaminating other suites.
   const origError = console.error
   beforeAll(() => {
     console.error = () => {}
+  })
+  afterAll(() => {
+    console.error = origError
   })
 
   it('redirects to /explore when not authenticated', () => {

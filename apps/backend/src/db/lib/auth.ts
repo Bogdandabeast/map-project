@@ -94,6 +94,17 @@ export const auth = new Proxy<ReturnType<typeof betterAuth>>(
  * passed separately since it's a Cloudflare platform binding, not
  * a validated string.
  */
+/**
+ * Parse a comma-separated list of trusted origins, trimming each entry.
+ * Falls back to localhost + capacitor for local development.
+ */
+function resolveTrustedOrigins(raw: string | undefined): string[] {
+  if (raw && raw.trim().length > 0) {
+    return raw.split(',').map(s => s.trim()).filter(Boolean)
+  }
+  return ['http://localhost:5173', 'capacitor://localhost']
+}
+
 export function createAuth(env: BackendEnv & { DB: D1Database }) {
   const db = drizzle(env.DB)
   return betterAuth({
@@ -110,7 +121,7 @@ export function createAuth(env: BackendEnv & { DB: D1Database }) {
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: ['http://localhost:5173', 'capacitor://localhost'],
+    trustedOrigins: resolveTrustedOrigins(env.TRUSTED_ORIGINS),
     user: {
       deleteUser: {
         enabled: true,

@@ -1,6 +1,6 @@
 import type { Session, User } from 'better-auth'
 import type { ReactNode } from 'react'
-import { IonSpinner, IonText } from '@ionic/react'
+import { IonSpinner } from '@ionic/react'
 import { createContext, useContext } from 'react'
 import { useSession } from '../../lib/auth-client'
 
@@ -12,6 +12,7 @@ interface AuthContextType {
   user: User | null
   isPending: boolean
   isAuthenticated: boolean
+  error: Error | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -19,25 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, isPending, error } = useSession()
   const user = session?.user ?? null
-  const isAuthenticated = !!user
-
-  if (error) {
-    return (
-      <div
-        data-testid="auth-error"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <IonText color="danger">
-          <p>Authentication error. Please try again later.</p>
-        </IonText>
-      </div>
-    )
-  }
+  const isAuthenticated = !!user && !error
 
   if (isPending) {
     return (
@@ -57,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     // eslint-disable-next-line react/no-context-provider -- React 18 pattern
-    <AuthContext.Provider value={{ session, user, isPending, isAuthenticated }}>
+    <AuthContext.Provider value={{ session, user, isPending, isAuthenticated, error }}>
       {children}
     </AuthContext.Provider>
   )

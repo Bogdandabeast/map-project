@@ -1,3 +1,4 @@
+import type { BackendEnv } from './env'
 import type { AppEnv } from './types/hono'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -18,10 +19,20 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
+// Lazy singleton: better-auth instance is expensive to create per request.
+// The D1 binding is stable across requests within the same worker isolate.
+let authInstance: ReturnType<typeof createAuth> | null = null
+let authEnv: BackendEnv | null = null
+let authDB: D1Database | null = null
+
 app.on(['POST', 'GET'], '/api/auth/*', async (c) => {
   const env = parseEnv(c.env as unknown as Record<string, unknown>)
-  const auth = createAuth({ ...env, DB: c.env.DB })
-  return auth.handler(c.req.raw)
+  if (!authInstance || authDB !== c.env.DB || !authEnv) {
+    authEnv = env
+    authDB = c.env.DB
+    authInstance = createAuth({ ...env, DB: c.env.DB })
+  }
+  return authInstance.handler(c.req.raw)
 })
 
 app.route('/api/users', usersRoutes)

@@ -17,6 +17,11 @@ import type { BackendEnv } from '../env'
 export interface AppBindings extends BackendEnv {
   DB: D1Database
   R2?: R2Bucket
+  /** S3-compatible credentials for R2 presigned URLs. Configure via secrets. */
+  R2_S3_ACCESS_KEY_ID?: string
+  R2_S3_SECRET_ACCESS_KEY?: string
+  R2_S3_BUCKET_NAME?: string
+  R2_ACCOUNT_ID?: string
 }
 
 export interface AppVariables {

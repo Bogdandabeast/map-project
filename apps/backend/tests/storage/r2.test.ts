@@ -41,9 +41,9 @@ describe('createPresignedUrl', () => {
       R2: mockR2(),
     }
 
-    // RED: createPresignedUrl will throw because the mock is incomplete,
-    // OR it will produce some output. We test that the return is a string.
-    // When fully implemented, it should return a URL-like string.
+    // When no S3 credentials are provided, createPresignedUrl falls back
+    // to a dev-friendly placeholder URL. This test verifies the function
+    // returns a non-empty string without throwing.
     const result = await createPresignedUrl(
       env as unknown as { R2: R2Bucket },
       'avatars/user-id/123.jpg',

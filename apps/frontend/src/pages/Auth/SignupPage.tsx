@@ -1,8 +1,8 @@
 import { IonButton, IonInput, IonItem, IonLabel, IonText } from '@ionic/react'
 import { useState } from 'react'
 import { Link, Redirect } from 'react-router-dom'
-import { signUp } from '../../lib/auth-client'
 import { useAuth } from '../../components/auth/AuthProvider'
+import { signUp } from '../../lib/auth-client'
 
 export function SignupPage() {
   const { isAuthenticated } = useAuth()
