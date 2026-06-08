@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from "hono"
-import { createAuth, type AuthFactory } from "../db/lib/auth"
+import { createAuth } from "../db/lib/auth"
 import type { AppEnv } from "../types/hono"
+import type { AuthFactory } from "../types/auth"
 
 /**
  * Internal middleware factory. Accepts an `AuthFactory` so tests can

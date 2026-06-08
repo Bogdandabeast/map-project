@@ -9,6 +9,7 @@
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.6.14",
     "@repo/env": "workspace:*",
+    "@repo/types": "workspace:*",
     "better-auth": "^1.6.14",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.23",

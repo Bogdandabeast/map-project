@@ -1,33 +1,20 @@
-import type { DrizzleD1Database } from 'drizzle-orm/d1'
-import type { AuthFactory } from '../db/lib/auth'
-import type { AppEnv } from '../types/hono'
 import { and, count, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createAuth } from '../db/lib/auth'
 import { createDb } from '../db/lib/database'
 import { user } from '../db/schema/auth'
 import { userGames } from '../db/schema/user-games'
-import {
-  optionalAuthMiddleware,
-} from '../middlewares/optionalAuth'
-import {
-  requireRoleMiddleware,
-} from '../middlewares/requireRole'
+import { optionalAuthMiddleware } from '../middlewares/optionalAuth'
+import { requireRoleMiddleware } from '../middlewares/requireRole'
 import { createPresignedUrl } from '../storage/r2'
-
-// DB type that works for both D1 (production) and libsql (tests)
-type AnyDrizzleDb = DrizzleD1Database | ReturnType<
-  import('drizzle-orm/libsql').drizzle
->
-
-export interface UserRoutesOptions {
-  authFactory?: AuthFactory
-  /**
-   * Returns a Drizzle DB instance from the environment. In tests,
-   *  this can return a libsql-backed instance.
-   */
-  getDb?: (env: AppEnv['Bindings']) => AnyDrizzleDb
-}
+import type { AppEnv } from '../types/hono'
+import type {
+  AnyDrizzleDb,
+  AvatarKeyBody,
+  LinkGameBody,
+  UserRoutesOptions,
+} from '../types'
+import type { AuthFactory } from '../types/auth'
 
 export function createUserRoutes(options: UserRoutesOptions = {}) {
   const authFactory = options.authFactory ?? createAuth
@@ -73,7 +60,7 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
     ]),
     async (c) => {
       const currentUser = c.var.user!
-      const body = (await c.req.json()) as { key?: string }
+      const body = (await c.req.json()) as AvatarKeyBody
 
       if (!body.key) {
         return c.json({ error: 'key is required' }, 400)
@@ -102,10 +89,7 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
     ]),
     async (c) => {
       const currentUser = c.var.user!
-      const body = (await c.req.json()) as {
-        gameId?: string
-        skillLevel?: string
-      }
+      const body = (await c.req.json()) as LinkGameBody
 
       if (!body.gameId) {
         return c.json({ error: 'gameId is required' }, 400)

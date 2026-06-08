@@ -8,9 +8,10 @@
  * @example
  * ```ts
  * const { uploadUrl, key } = createPresignedUrl(env, "avatars/u1/a.jpg")
- * // Client does: fetch(uploadUrl, { method: "PUT", body: file })
  * ```
  */
+
+import type { R2UploadEnv } from '../types'
 
 /**
  * Generate a pre-signed URL for uploading an object to R2.
@@ -24,7 +25,7 @@
  * @param expiresInSeconds - URL expiration in seconds (default 3600)
  */
 export async function createPresignedUrl(
-  env: { R2?: R2Bucket },
+  env: R2UploadEnv,
   key: string,
   expiresInSeconds = 3600,
 ): Promise<string> {
