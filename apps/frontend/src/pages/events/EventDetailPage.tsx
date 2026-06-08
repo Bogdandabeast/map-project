@@ -85,7 +85,8 @@ function EventDetailContent() {
   const [canceled, setCanceled] = useState(false)
 
   useEffect(() => {
-    if (id) {
+    // Guard: 'create' is a route path, not an event ID
+    if (id && id !== 'create') {
       fetchEvent(id)
       fetchAttendees(id)
     }
