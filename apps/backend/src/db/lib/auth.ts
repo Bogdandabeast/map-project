@@ -1,6 +1,10 @@
 /* eslint-disable node/prefer-global/process -- Cloudflare Workers nodejs_compat */
+import type { BackendEnv } from '../../env'
+import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { betterAuth } from 'better-auth'
 import { admin, bearer, jwt } from 'better-auth/plugins'
+import { drizzle } from 'drizzle-orm/d1'
+import { account, jwks, session, user, verification } from '../schema/auth'
 
 function requireSecret(value: string | undefined, name: string): string {
   if (!value) {
@@ -14,10 +18,13 @@ function requireSecret(value: string | undefined, name: string): string {
 }
 
 /**
- * Better Auth with native D1 support.
+ * Better Auth with Drizzle ORM + D1 adapter.
  *
- * Pass env.DB directly as the database option — Better Auth auto-detects
- * the D1 binding and uses its built-in Kysely adapter.
+ * We use `drizzleAdapter` so Better Auth respects the Drizzle column
+ * name mappings (snake_case in SQLite → camelCase in JS).  Passing
+ * `env.DB` directly would make Better Auth's built-in Kysely adapter
+ * generate SQL with camelCase columns, which don't exist in the
+ * Drizzle-created tables.
  *
  * For CLI tools (auth generate), the static export is used.
  * At runtime, call createAuth(env) with the Worker environment.
@@ -80,19 +87,20 @@ export const auth = new Proxy<ReturnType<typeof betterAuth>>(
 )
 
 /**
- * Create an auth instance with the real D1 binding from the Worker env.
+ * Create an auth instance from the already-validated environment.
+ *
+ * All string-based secrets and URLs come from {@link BackendEnv}
+ * (parsed by Zod at the handler level).  Only the D1 binding is
+ * passed separately since it's a Cloudflare platform binding, not
+ * a validated string.
  */
-export function createAuth(env: {
-  DB: D1Database
-  BETTER_AUTH_SECRET: string
-  BETTER_AUTH_URL?: string
-  GOOGLE_CLIENT_ID?: string
-  GOOGLE_CLIENT_SECRET?: string
-  GITHUB_CLIENT_ID?: string
-  GITHUB_CLIENT_SECRET?: string
-}) {
+export function createAuth(env: BackendEnv & { DB: D1Database }) {
+  const db = drizzle(env.DB)
   return betterAuth({
-    database: env.DB,
+    database: drizzleAdapter(db, {
+      provider: 'sqlite',
+      schema: { user, session, account, verification, jwks },
+    }),
     emailAndPassword: {
       enabled: true,
       sendResetPassword: async ({ user, url }) => {
@@ -100,8 +108,8 @@ export function createAuth(env: {
         console.log(`Password reset requested for ${user.email}: ${url}`)
       },
     },
-    baseURL: env.BETTER_AUTH_URL || 'http://localhost:3000',
-    secret: requireSecret(env.BETTER_AUTH_SECRET, 'env.BETTER_AUTH_SECRET'),
+    baseURL: env.BETTER_AUTH_URL,
+    secret: env.BETTER_AUTH_SECRET,
     user: {
       deleteUser: {
         enabled: true,
@@ -109,12 +117,12 @@ export function createAuth(env: {
     },
     socialProviders: {
       google: {
-        clientId: env.GOOGLE_CLIENT_ID || '',
-        clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
       },
       github: {
-        clientId: env.GITHUB_CLIENT_ID || 'Ov23liOjyONaA3HvyIDr',
-        clientSecret: env.GITHUB_CLIENT_SECRET || '80c4733a5755064e8f936c79201dc34867fe3ce9',
+        clientId: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
       },
     },
     account: {
