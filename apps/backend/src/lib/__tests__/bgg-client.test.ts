@@ -123,4 +123,14 @@ describe('getBoardGameDetail', () => {
     expect(result.description).toBeNull()
     expect(result.image).toBeNull()
   })
+
+  test('rejects when BGG response has no item', async () => {
+    mockBggRequest.mockResolvedValueOnce({
+      items: {},
+    })
+
+    await expect(getBoardGameDetail(999)).rejects.toThrow(
+      'BGG game not found for ID: 999',
+    )
+  })
 })

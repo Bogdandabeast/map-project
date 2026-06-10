@@ -3,6 +3,7 @@ import { z } from 'zod/v4'
 // ── Game Search Schema ────────────────────────────────────────────
 export const gameSearchSchema = z.object({
   q: z.string().min(1).max(100),
+  limit: z.number().int().min(1).max(100).optional(),
 })
 
 export type GameSearchInput = z.infer<typeof gameSearchSchema>

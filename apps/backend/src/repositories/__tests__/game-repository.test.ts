@@ -1,4 +1,3 @@
-import type { GameRepository } from '../game-repository'
 /**
  * Game Repository tests (Task 1.5)
  *
@@ -6,7 +5,7 @@ import type { GameRepository } from '../game-repository'
  * Uses the same pattern as events integration tests.
  */
 import { Database } from 'bun:sqlite'
-import { beforeEach, describe, expect, test } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { drizzle } from 'drizzle-orm/bun-sqlite'
 import * as schema from '../../db/schema/game'
 import { createGameRepository } from '../game-repository'
@@ -36,18 +35,11 @@ function createTestGameDb() {
   return { db, sqlite }
 }
 
-let repo: GameRepository
-
-beforeEach(() => {
-  const { db } = createTestGameDb()
-  repo = createGameRepository(db)
-})
-
 describe('searchByName', () => {
-  test('returns matching games by ILIKE partial title', async () => {
+  test('returns matching games by case-insensitive partial title (SQLite LIKE)', async () => {
     // Seed: insert directly via raw SQL since repo only exposes operations
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -65,7 +57,7 @@ describe('searchByName', () => {
 
   test('returns empty array when no match found', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -78,7 +70,7 @@ describe('searchByName', () => {
 
   test('respects limit parameter', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -95,7 +87,7 @@ describe('searchByName', () => {
 describe('findById', () => {
   test('returns a game by UUID', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -109,6 +101,8 @@ describe('findById', () => {
   })
 
   test('returns null for non-existent id', async () => {
+    const { db } = createTestGameDb()
+    const repo = createGameRepository(db)
     const result = await repo.findById('non-existent-id')
     expect(result).toBeNull()
   })
@@ -117,7 +111,7 @@ describe('findById', () => {
 describe('getPopular', () => {
   test('returns games ordered by accessCount DESC', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -135,7 +129,7 @@ describe('getPopular', () => {
 
   test('respects limit parameter', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -152,15 +146,16 @@ describe('getPopular', () => {
 describe('getRecent', () => {
   test('returns games ordered by createdAt DESC', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     const now = Date.now()
-    sqlite.exec(`
-      INSERT INTO game (id, title, access_count, source, created_at) VALUES
-        ('g-1', 'Oldest', 1, 'manual', ${now - 30000}),
-        ('g-2', 'Middle', 5, 'manual', ${now - 10000}),
-        ('g-3', 'Newest', 10, 'bgg', ${now});
-    `)
+    sqlite.run(
+      `INSERT INTO game (id, title, access_count, source, created_at) VALUES
+        ('g-1', 'Oldest', 1, 'manual', ?),
+        ('g-2', 'Middle', 5, 'manual', ?),
+        ('g-3', 'Newest', 10, 'bgg', ?);`,
+      [now - 30000, now - 10000, now],
+    )
 
     const results = await repo.getRecent(3)
     expect(results.length).toBe(3)
@@ -171,14 +166,15 @@ describe('getRecent', () => {
 
   test('respects limit parameter', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     const now = Date.now()
-    sqlite.exec(`
-      INSERT INTO game (id, title, access_count, source, created_at) VALUES
-        ('g-1', 'Game 1', 1, 'manual', ${now}),
-        ('g-2', 'Game 2', 2, 'manual', ${now});
-    `)
+    sqlite.run(
+      `INSERT INTO game (id, title, access_count, source, created_at) VALUES
+        ('g-1', 'Game 1', 1, 'manual', ?),
+        ('g-2', 'Game 2', 2, 'manual', ?);`,
+      [now, now],
+    )
 
     const results = await repo.getRecent(1)
     expect(results.length).toBe(1)
@@ -188,7 +184,7 @@ describe('getRecent', () => {
 describe('upsert', () => {
   test('inserts a new game when bggId does not exist', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     const result = await repo.upsert({
       bggId: 13,
@@ -215,7 +211,7 @@ describe('upsert', () => {
 
   test('updates existing game when bggId already exists', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     // First insert
     await repo.upsert({
@@ -257,7 +253,7 @@ describe('upsert', () => {
 describe('incrementAccess', () => {
   test('increments accessCount by 1', async () => {
     const { db, sqlite } = createTestGameDb()
-    repo = createGameRepository(db)
+    const repo = createGameRepository(db)
 
     sqlite.exec(`
       INSERT INTO game (id, title, access_count, source) VALUES
@@ -273,6 +269,8 @@ describe('incrementAccess', () => {
   })
 
   test('does nothing for non-existent game id', async () => {
+    const { db } = createTestGameDb()
+    const repo = createGameRepository(db)
     // Should not throw
     await repo.incrementAccess('non-existent')
     // Test passes if no error is thrown

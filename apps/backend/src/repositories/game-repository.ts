@@ -32,6 +32,12 @@ export interface GameRepository {
   incrementAccess: (id: string) => Promise<void>
 }
 
+// ── Helpers ───────────────────────────────────────────────────────
+
+function clampLimit(limit: number, max: number): number {
+  return Math.max(1, Math.min(Math.floor(limit), max))
+}
+
 // ── Factory ───────────────────────────────────────────────────────
 
 export function createGameRepository(
@@ -39,11 +45,12 @@ export function createGameRepository(
 ): GameRepository {
   return {
     async searchByName(query: string, limit = 20) {
+      const safeLimit = clampLimit(limit, 100)
       return db
         .select()
         .from(game)
         .where(like(game.title, `%${query}%`))
-        .limit(limit)
+        .limit(safeLimit)
         .all()
     },
 
@@ -58,20 +65,22 @@ export function createGameRepository(
     },
 
     async getPopular(limit = 50) {
+      const safeLimit = clampLimit(limit, 100)
       return db
         .select()
         .from(game)
         .orderBy(desc(game.accessCount))
-        .limit(limit)
+        .limit(safeLimit)
         .all()
     },
 
     async getRecent(limit = 20) {
+      const safeLimit = clampLimit(limit, 100)
       return db
         .select()
         .from(game)
         .orderBy(desc(game.createdAt))
-        .limit(limit)
+        .limit(safeLimit)
         .all()
     },
 
@@ -117,6 +126,9 @@ export function createGameRepository(
         .limit(1)
         .all()
 
+      if (!result[0]) {
+        throw new Error(`Failed to read game after upsert for bggId: ${input.bggId}`)
+      }
       return result[0]
     },
 
