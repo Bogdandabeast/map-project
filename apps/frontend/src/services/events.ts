@@ -47,29 +47,43 @@ async function request<T>(
   options: RequestInit & { expectNoContent?: boolean } = {},
 ): Promise<T> {
   const { headers: optHeaders, expectNoContent, ...rest } = options
+
+  // Default Content-Type goes first, then optHeaders spread so it can override
   const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
     ...(optHeaders instanceof Headers
       ? Object.fromEntries(optHeaders.entries())
       : (optHeaders as Record<string, string> | undefined)),
-    'Content-Type': 'application/json',
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    credentials: 'include',
-    headers,
-  })
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...rest,
+      credentials: 'include',
+      headers,
+    })
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: response.statusText }))
-    throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`)
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }))
+      throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    if (response.status === 204) {
+      return undefined as unknown as T
+    }
+
+    return response.json() as Promise<T>
   }
-
-  if (response.status === 204) {
-    return undefined as unknown as T
+  catch (err: unknown) {
+    // Re-throw HTTP errors as-is (already a meaningful Error)
+    if (err instanceof Error && err.message.startsWith('HTTP ')) {
+      throw err
+    }
+    // Wrap network/parse errors with context
+    throw new Error(
+      `Request failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+    )
   }
-
-  return response.json() as Promise<T>
 }
 
 // ── API functions ─────────────────────────────────────────────────────
@@ -79,13 +93,14 @@ export async function createEvent(
   data: {
     title: string
     address: string
-    lat: number
-    lng: number
+    lat?: number
+    lng?: number
     date: number
     capacity: number
     plannedGames?: string[]
     skillLevel?: string
     atmosphere?: string
+    imageKey?: string | null
   },
 ): Promise<EventData> {
   return request<EventData>('/api/events', {
@@ -154,6 +169,11 @@ export async function getAttendees(eventId: string): Promise<Attendee[]> {
   return request<Attendee[]>(
     `/api/events/${encodeURIComponent(eventId)}/attendees`,
   )
+}
+
+/** GET /api/events/:id — Get a single event */
+export async function getEventById(id: string): Promise<EventData> {
+  return request<EventData>(`/api/events/${encodeURIComponent(id)}`)
 }
 
 /** GET /api/me/events?filter=created|attending|all — Get my events */

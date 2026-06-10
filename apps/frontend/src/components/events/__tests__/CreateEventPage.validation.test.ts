@@ -46,7 +46,7 @@ describe('validateCreateEventForm', () => {
       ...validData,
       date: new Date(Date.now() - 86400000).toISOString(),
     })
-    expect(errors.date).toContain('future')
+    expect(errors.date).toContain('5 minutes from now')
   })
 
   it('rejects capacity of 0', () => {

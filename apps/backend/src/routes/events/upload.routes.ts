@@ -6,8 +6,8 @@
  *   Response: { uploadUrl: string, key: string }
  */
 import type { AuthFactory } from '../../types/auth'
-import type { AppEnv } from '../../types/hono'
 import type { AnyDrizzleDb } from '../../types/database'
+import type { AppEnv } from '../../types/hono'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createAuth } from '../../db/lib/auth'
@@ -69,11 +69,12 @@ export function createUploadRoutes(options: UploadRoutesOptions = {}) {
       if (body.contentType && typeof body.contentType === 'string') {
         contentType = body.contentType
       }
-    } catch {
+    }
+    catch {
       // No body or invalid JSON — use default content type
     }
 
-    // Derive extension from content type
+    // Validate content type against allowed list + derive extension
     const extMap: Record<string, string> = {
       'image/jpeg': 'jpg',
       'image/png': 'png',
@@ -81,7 +82,11 @@ export function createUploadRoutes(options: UploadRoutesOptions = {}) {
       'image/gif': 'gif',
       'image/avif': 'avif',
     }
-    const ext = extMap[contentType] ?? 'jpg'
+    const allowedTypes = Object.keys(extMap)
+    if (!allowedTypes.includes(contentType)) {
+      contentType = 'image/jpeg'
+    }
+    const ext = extMap[contentType]
 
     const key = `events/${eventId}/${Date.now()}.${ext}`
 

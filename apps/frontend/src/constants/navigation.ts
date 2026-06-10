@@ -12,7 +12,7 @@ import {
 
 export interface MenuItem {
   path: string
-  icon: any
+  icon: string
   label: string
   auth: boolean
 }
@@ -26,5 +26,5 @@ export const menuItems: MenuItem[] = [
   { path: '/settings', icon: settingsOutline, label: 'Ajustes', auth: true },
   { path: '/login', icon: logInOutline, label: 'Login', auth: false },
   { path: '/signup', icon: personAddOutline, label: 'Registro', auth: false },
-  { path: '/forgot-password', icon: searchOutline, label: 'Reset Password', auth: false },
+  { path: '/forgot-password', icon: searchOutline, label: 'Olvidé contraseña', auth: false },
 ]

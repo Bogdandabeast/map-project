@@ -18,7 +18,7 @@ export class EventAdapter {
    * Maps a list of API EventData to Domain Events
    */
   static toDomainList(apiEvents: EventData[]): Event[] {
-    return apiEvents.map(this.toDomain)
+    return apiEvents.map(e => EventAdapter.toDomain(e))
   }
 
   /**
@@ -35,13 +35,13 @@ export class EventAdapter {
    * Maps a list of API Attendees to Domain Attendees
    */
   static toAttendeeDomainList(apiAttendees: ApiAttendee[]): Attendee[] {
-    return apiAttendees.map(this.toAttendeeDomain)
+    return apiAttendees.map(a => EventAdapter.toAttendeeDomain(a))
   }
 
   /**
    * Maps Domain Event back to API payload (for POST/PATCH)
    */
-  static toApiPayload(event: Partial<Event>): any {
+  static toApiPayload(event: any): any {
     const payload = { ...event }
     if (payload.date instanceof Date)
       payload.date = payload.date.getTime()

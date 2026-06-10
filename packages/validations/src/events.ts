@@ -13,8 +13,8 @@ export const EventStatus = z.enum([
 export const createEventSchema = z.object({
   title: z.string().min(3).max(200),
   address: z.string().min(1).max(500),
-  lat: z.number().min(-90).max(90),
-  lng: z.number().min(-180).max(180),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
   date: z.number().int().refine(ts => ts > Date.now(), {
     message: 'Event date must be in the future',
   }),

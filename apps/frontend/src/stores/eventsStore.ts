@@ -1,6 +1,8 @@
+import type { CreateEventDTO } from '../repositories/EventRepository'
 import type { Attendee, Event, MyEventsFilter } from '../types/event.types'
 import { create } from 'zustand'
 import { eventRepository } from '../repositories/EventRepository'
+import { getUploadUrl as getUploadUrlService } from '../services/events'
 
 // ── State shape ────────────────────────────────────────────────────
 
@@ -23,7 +25,7 @@ export interface EventsStore {
 
   // Actions — CRUD
   fetchEvent: (id: string) => Promise<void>
-  createEvent: (data: any) => Promise<Event | null>
+  createEvent: (data: CreateEventDTO) => Promise<Event | null>
   updateEvent: (id: string, data: Record<string, unknown>) => Promise<Event | null>
   deleteEvent: (id: string) => Promise<boolean>
   cancelEvent: (id: string) => Promise<Event | null>
@@ -218,10 +220,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   // ── Get upload URL ─────────────────────────────────────────────
   getUploadUrl: async (eventId, contentType) => {
     try {
-      // For upload URLs, we call the service directly as it's an infrastructure detail
-      // and doesn't involve a domain entity mapping.
-      const { getUploadUrl } = await import('../services/events')
-      return await getUploadUrl(eventId, contentType)
+      return await getUploadUrlService(eventId, contentType)
     }
     catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to get upload URL'
