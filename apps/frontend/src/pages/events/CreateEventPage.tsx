@@ -52,8 +52,8 @@ export function validateCreateEventForm(data: {
   }
   else {
     const parsed = new Date(data.date).getTime()
-    if (parsed <= Date.now()) {
-      errors.date = 'Date must be in the future'
+    if (parsed <= Date.now() + 5 * 60 * 1000) {
+      errors.date = 'Date must be at least 5 minutes from now'
     }
   }
 
@@ -87,18 +87,19 @@ function CreateEventForm() {
   const [plannedGames, setPlannedGames] = useState('')
   const [skillLevel, setSkillLevel] = useState<string | undefined>(undefined)
   const [atmosphere, setAtmosphere] = useState('')
-  const [_imageKey, setImageKey] = useState<string | null>(null)
+  const [imageKey, setImageKey] = useState<string | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
+  const [createdEventId, setCreatedEventId] = useState<string | null>(null)
 
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const minDate = useMemo(() => new Date(Date.now() + 3600000).toISOString(), [])
 
   useEffect(() => {
-    if (formState.isSuccess) {
+    if (formState.isSuccess && !createdEventId) {
       resetFormState()
       setShouldRedirect(true)
     }
-  }, [formState.isSuccess, resetFormState])
+  }, [formState.isSuccess, resetFormState, createdEventId])
 
   if (shouldRedirect) {
     return <Redirect to="/my/events" />
@@ -116,11 +117,10 @@ function CreateEventForm() {
     // Parse date to Unix ms
     const dateMs = new Date(date).getTime()
 
-    await createEvent({
+    const event = await createEvent({
       title: title.trim(),
       address: address.trim(),
-      lat: 0, // Placeholder — geocoding would be added later
-      lng: 0, // Placeholder
+      // TODO: implement geocoding — remove optional omission when implemented
       date: dateMs,
       capacity,
       plannedGames: plannedGames.trim()
@@ -128,11 +128,19 @@ function CreateEventForm() {
         : undefined,
       skillLevel: skillLevel || undefined,
       atmosphere: atmosphere.trim() || undefined,
+      imageKey,
     })
+
+    if (event) {
+      setCreatedEventId(event.id)
+    }
   }
 
-  const handleUploadUrl = async (_contentType: string) => {
-    return null
+  const handleUploadUrl = async (contentType: string) => {
+    if (!createdEventId)
+      return null
+    const store = useEventsStore.getState()
+    return store.getUploadUrl(createdEventId, contentType)
   }
 
   return (

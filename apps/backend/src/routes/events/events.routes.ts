@@ -13,18 +13,18 @@
  *   upcoming  → otherwise
  */
 import type { AuthFactory } from '../../types/auth'
-import type { AppEnv } from '../../types/hono'
 import type { AnyDrizzleDb } from '../../types/database'
-import { eq } from 'drizzle-orm'
-import { Hono } from 'hono'
-import { createAuth } from '../../db/lib/auth'
-import { createDb } from '../../db/lib/database'
-import { eventAttendees, events } from '../../db/schema/events-core'
-import { requireRoleMiddleware } from '../../middlewares/requireRole'
+import type { AppEnv } from '../../types/hono'
 import {
   createEventSchema,
   updateEventSchema,
 } from '@repo/validations/events'
+import { eq } from 'drizzle-orm'
+import { Hono } from 'hono'
+import { createAuth } from '../../db/lib/auth'
+import { createDb } from '../../db/lib/database'
+import { events } from '../../db/schema/events-core'
+import { requireRoleMiddleware } from '../../middlewares/requireRole'
 
 // ── Options ──────────────────────────────────────────────────────────
 
@@ -48,9 +48,12 @@ export function computeEventStatus(
     attendeeCount?: number
   },
 ): string {
-  if (event.status === 'cancelled') return 'cancelled'
-  if (event.date < Date.now()) return 'past'
-  if (event.capacity > 0 && (event.attendeeCount ?? 0) >= event.capacity) return 'full'
+  if (event.status === 'cancelled')
+    return 'cancelled'
+  if (event.date < Date.now())
+    return 'past'
+  if (event.capacity > 0 && (event.attendeeCount ?? 0) >= event.capacity)
+    return 'full'
   return 'upcoming'
 }
 
@@ -78,7 +81,8 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     let body: unknown
     try {
       body = await c.req.json()
-    } catch {
+    }
+    catch {
       return c.json({ error: 'Invalid JSON body' }, 400)
     }
 
@@ -91,15 +95,14 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     }
 
     const id = crypto.randomUUID()
-    const now = Date.now()
     const db = getDb(c.env)
 
     await db.insert(events).values({
       id,
       title: parsed.data.title,
       address: parsed.data.address,
-      lat: parsed.data.lat,
-      lng: parsed.data.lng,
+      lat: parsed.data.lat ?? 0,
+      lng: parsed.data.lng ?? 0,
       date: parsed.data.date,
       capacity: parsed.data.capacity,
       plannedGames: parsed.data.plannedGames ?? [],
@@ -148,6 +151,49 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     )
   })
 
+  // ── GET /:id — Get single event ─────────────────────────────────
+
+  routes.get('/:id', auth, async (c) => {
+    const id = c.req.param('id')
+
+    const db = getDb(c.env)
+
+    const found = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, id))
+      .limit(1)
+
+    if (!found[0]) {
+      return c.json({ error: 'Event not found' }, 404)
+    }
+
+    const event = found[0]
+    const computedStatus = computeEventStatus({
+      status: event.status,
+      date: event.date,
+      capacity: event.capacity,
+    })
+
+    return c.json({
+      id: event.id,
+      title: event.title,
+      address: event.address,
+      lat: event.lat,
+      lng: event.lng,
+      date: event.date,
+      capacity: event.capacity,
+      plannedGames: event.plannedGames,
+      skillLevel: event.skillLevel,
+      atmosphere: event.atmosphere,
+      imageKey: event.imageKey,
+      creatorId: event.creatorId,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+      status: computedStatus,
+    })
+  })
+
   // ── PATCH /:id — Edit event (creator only) ─────────────────────
 
   routes.patch('/:id', auth, async (c) => {
@@ -177,7 +223,8 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     let body: unknown
     try {
       body = await c.req.json()
-    } catch {
+    }
+    catch {
       return c.json({ error: 'Invalid JSON body' }, 400)
     }
 
@@ -191,15 +238,24 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
 
     // Build update object from only the provided fields
     const updates: Record<string, unknown> = {}
-    if (parsed.data.title !== undefined) updates.title = parsed.data.title
-    if (parsed.data.address !== undefined) updates.address = parsed.data.address
-    if (parsed.data.lat !== undefined) updates.lat = parsed.data.lat
-    if (parsed.data.lng !== undefined) updates.lng = parsed.data.lng
-    if (parsed.data.date !== undefined) updates.date = parsed.data.date
-    if (parsed.data.capacity !== undefined) updates.capacity = parsed.data.capacity
-    if (parsed.data.plannedGames !== undefined) updates.plannedGames = parsed.data.plannedGames
-    if (parsed.data.skillLevel !== undefined) updates.skillLevel = parsed.data.skillLevel
-    if (parsed.data.atmosphere !== undefined) updates.atmosphere = parsed.data.atmosphere
+    if (parsed.data.title !== undefined)
+      updates.title = parsed.data.title
+    if (parsed.data.address !== undefined)
+      updates.address = parsed.data.address
+    if (parsed.data.lat !== undefined)
+      updates.lat = parsed.data.lat
+    if (parsed.data.lng !== undefined)
+      updates.lng = parsed.data.lng
+    if (parsed.data.date !== undefined)
+      updates.date = parsed.data.date
+    if (parsed.data.capacity !== undefined)
+      updates.capacity = parsed.data.capacity
+    if (parsed.data.plannedGames !== undefined)
+      updates.plannedGames = parsed.data.plannedGames
+    if (parsed.data.skillLevel !== undefined)
+      updates.skillLevel = parsed.data.skillLevel
+    if (parsed.data.atmosphere !== undefined)
+      updates.atmosphere = parsed.data.atmosphere
     updates.updatedAt = Date.now()
 
     if (Object.keys(updates).length === 0) {

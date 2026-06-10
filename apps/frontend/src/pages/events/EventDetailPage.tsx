@@ -16,20 +16,18 @@ import {
 } from '@ionic/react'
 import {
   calendarOutline,
-  createOutline,
+  closeCircleOutline,
   locationOutline,
   peopleOutline,
   trashOutline,
-  closeCircleOutline,
 } from 'ionicons/icons'
 import { useEffect, useState } from 'react'
-import { useParams, useHistory, Redirect } from 'react-router-dom'
+import { Redirect, useParams } from 'react-router-dom'
 import { useAuth } from '../../components/auth/AuthProvider'
 import { ProtectedRoute } from '../../components/auth/ProtectedRoute'
 import { AttendeeList } from '../../components/events/AttendeeList'
 import { RsvpButton } from '../../components/events/RsvpButton'
 import { useEventsStore } from '../../stores/eventsStore'
-import type { EventData } from '../../services/events'
 
 // ── Status badge config ───────────────────────────────────────────
 
@@ -63,7 +61,6 @@ export function EventDetailPage() {
 
 function EventDetailContent() {
   const { id } = useParams<{ id: string }>()
-  const history = useHistory()
   const { user } = useAuth()
 
   const {
@@ -82,11 +79,10 @@ function EventDetailContent() {
   } = useEventsStore()
 
   const [deleted, setDeleted] = useState(false)
-  const [canceled, setCanceled] = useState(false)
 
   useEffect(() => {
-    // Guard: 'create' is a route path, not an event ID
-    if (id && id !== 'create') {
+    // Guard: skip non-numeric route paths (e.g. 'create') that are not event IDs
+    if (id && /^[\w-]+$/.test(id) && id !== 'create') {
       fetchEvent(id)
       fetchAttendees(id)
     }
@@ -137,29 +133,34 @@ function EventDetailContent() {
   const statusConfig = STATUS_CONFIG[event.status] ?? { color: 'medium', label: event.status }
 
   const handleDelete = async () => {
+    // eslint-disable-next-line no-alert
     const confirmed = window.confirm('Are you sure you want to delete this event?')
-    if (!confirmed) return
+    if (!confirmed)
+      return
     const ok = await deleteEvent(event.id)
-    if (ok) setDeleted(true)
+    if (ok)
+      setDeleted(true)
   }
 
   const handleCancel = async () => {
+    // eslint-disable-next-line no-alert
     const confirmed = window.confirm('Are you sure you want to cancel this event?')
-    if (!confirmed) return
+    if (!confirmed)
+      return
     await cancelEvent(event.id)
   }
 
-  const handleRsvp = async () => {
-    await rsvp(event.id)
-    await fetchAttendees(event.id)
-    setTimeout(() => resetRsvpState(), 2000)
+  const handleRsvpAction = async (
+    action: () => Promise<void>,
+    eventId: string,
+  ) => {
+    await action()
+    await fetchAttendees(eventId)
+    setTimeout(resetRsvpState, 2000)
   }
 
-  const handleLeave = async () => {
-    await leave(event.id)
-    await fetchAttendees(event.id)
-    setTimeout(() => resetRsvpState(), 2000)
-  }
+  const handleRsvp = () => handleRsvpAction(() => rsvp(event.id), event.id)
+  const handleLeave = () => handleRsvpAction(() => leave(event.id), event.id)
 
   return (
     <IonPage>

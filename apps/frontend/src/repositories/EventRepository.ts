@@ -2,6 +2,33 @@ import type { Attendee, Event, MyEventsFilter } from '../types/event.types'
 import { EventAdapter } from '../adapters/EventAdapter'
 import * as eventApi from '../services/events'
 
+// ── DTO types ──────────────────────────────────────────────────────
+
+export interface CreateEventDTO {
+  title: string
+  address: string
+  date: number
+  capacity: number
+  lat?: number
+  lng?: number
+  plannedGames?: string[]
+  skillLevel?: string
+  atmosphere?: string
+  imageKey?: string | null
+}
+
+export interface UpdateEventDTO {
+  title?: string
+  address?: string
+  date?: number
+  capacity?: number
+  lat?: number
+  lng?: number
+  plannedGames?: string[]
+  skillLevel?: string
+  atmosphere?: string
+}
+
 export class EventRepository {
   /**
    * Fetches all events for the current user based on filter
@@ -15,13 +42,8 @@ export class EventRepository {
    * Fetches a specific event by ID
    */
   async getEventById(id: string): Promise<Event> {
-    // The current API doesn't have a direct /api/events/:id GET in the service,
-    // it uses getMyEvents as a workaround. We maintain that logic here.
-    const events = await eventApi.getMyEvents('all')
-    const event = events.find(e => e.id === id)
-    if (!event)
-      throw new Error('Event not found')
-    return EventAdapter.toDomain(event)
+    const data = await eventApi.getEventById(id)
+    return EventAdapter.toDomain(data)
   }
 
   /**
@@ -35,7 +57,7 @@ export class EventRepository {
   /**
    * Creates a new event
    */
-  async createEvent(data: any): Promise<Event> {
+  async createEvent(data: CreateEventDTO): Promise<Event> {
     const payload = EventAdapter.toApiPayload(data)
     const response = await eventApi.createEvent(payload)
     return EventAdapter.toDomain(response)
@@ -44,7 +66,7 @@ export class EventRepository {
   /**
    * Updates an existing event
    */
-  async updateEvent(id: string, data: any): Promise<Event> {
+  async updateEvent(id: string, data: UpdateEventDTO): Promise<Event> {
     const payload = EventAdapter.toApiPayload(data)
     const response = await eventApi.updateEvent(id, payload)
     return EventAdapter.toDomain(response)

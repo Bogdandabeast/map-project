@@ -39,7 +39,9 @@ import './theme/variables.css'
 
 setupIonicReact()
 
-function RouteWatcher() {
+/** TODO: implement route-change tracking (analytics, page-view side-effects) */
+
+function _RouteWatcher() {
   return null
 }
 
