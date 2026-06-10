@@ -8,6 +8,13 @@
       "when": 1780935488763,
       "tag": "0000_sturdy_hannibal_king",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781119107155,
+      "tag": "0001_acoustic_calypso",
+      "breakpoints": true
     }
   ]
 }

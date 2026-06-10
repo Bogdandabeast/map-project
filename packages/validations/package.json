@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./events": "./src/events.ts"
+    "./events": "./src/events.ts",
+    "./game": "./src/game.ts"
   },
   "dependencies": {
     "zod": "^4.4.3"

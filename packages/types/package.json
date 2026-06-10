@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./users": "./src/users.ts",
-    "./map": "./src/map.ts"
+    "./map": "./src/map.ts",
+    "./games": "./src/games.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
