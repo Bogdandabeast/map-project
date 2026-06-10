@@ -9,9 +9,9 @@ interface AppLayoutProps {
 
 export function AppLayout({ title, children }: AppLayoutProps) {
   const { user } = useAuth()
-
   return (
     <IonPage>
+
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">

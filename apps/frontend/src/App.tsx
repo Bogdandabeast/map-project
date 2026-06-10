@@ -1,35 +1,16 @@
 import {
   IonApp,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonMenuToggle,
   IonRouterOutlet,
+  IonSpinner,
   IonSplitPane,
-  IonTitle,
-  IonToolbar,
   setupIonicReact,
 } from '@ionic/react'
 import { IonReactRouter } from '@ionic/react-router'
-import {
-  addCircleOutline,
-  calendarOutline,
-  compassOutline,
-  logInOutline,
-  mapOutline,
-  personAddOutline,
-  personOutline,
-  searchOutline,
-  settingsOutline,
-} from 'ionicons/icons'
-import { Redirect, Route } from 'react-router-dom'
+import { Redirect, Route, Switch } from 'react-router-dom'
 
-import { AuthProvider } from './components/auth/AuthProvider'
+import { AuthProvider, useAuth } from './components/auth/AuthProvider'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
+import { MainMenu } from './components/layout/MainMenu'
 import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage'
 import { LoginPage } from './pages/Auth/LoginPage'
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage'
@@ -46,7 +27,6 @@ import { SettingsPage } from './pages/Profile/SettingsPage'
 import '@ionic/react/css/core.css'
 import '@ionic/react/css/normalize.css'
 import '@ionic/react/css/structure.css'
-
 import '@ionic/react/css/typography.css'
 import '@ionic/react/css/padding.css'
 import '@ionic/react/css/float-elements.css'
@@ -59,44 +39,28 @@ import './theme/variables.css'
 
 setupIonicReact()
 
-const menuItems = [
-  { path: '/explore', icon: compassOutline, label: 'Explorar', auth: true },
-  { path: '/map', icon: mapOutline, label: 'Mapa', auth: true },
-  { path: '/my/events', icon: calendarOutline, label: 'Mis eventos', auth: true },
-  { path: '/events/create', icon: addCircleOutline, label: 'Crear evento', auth: true },
-  { path: '/profile', icon: personOutline, label: 'Perfil', auth: true },
-  { path: '/settings', icon: settingsOutline, label: 'Ajustes', auth: true },
-  { path: '/login', icon: logInOutline, label: 'Login', auth: false },
-  { path: '/signup', icon: personAddOutline, label: 'Registro', auth: false },
-  { path: '/forgot-password', icon: searchOutline, label: 'Reset Password', auth: false },
-]
+function RouteWatcher() {
+  return null
+}
 
-const App: React.FC = () => (
-  <IonApp>
-    <AuthProvider>
-      <IonReactRouter>
-        <IonSplitPane contentId="main-content">
-          <IonMenu contentId="main-content" type="overlay">
-            <IonHeader>
-              <IonToolbar>
-                <IonTitle>Mesa Cerca</IonTitle>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent>
-              <IonList>
-                {menuItems.map(item => (
-                  <IonMenuToggle key={item.path} autoHide>
-                    <IonItem routerLink={item.path} routerDirection="none" lines="none" detail={false}>
-                      <IonIcon slot="start" icon={item.icon} />
-                      <IonLabel>{item.label}</IonLabel>
-                    </IonItem>
-                  </IonMenuToggle>
-                ))}
-              </IonList>
-            </IonContent>
-          </IonMenu>
+function AppContent() {
+  const { isPending } = useAuth()
 
-          <IonRouterOutlet id="main-content">
+  if (isPending) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'black' }}>
+        <IonSpinner name="crescent" color="primary" />
+      </div>
+    )
+  }
+
+  return (
+    <IonReactRouter>
+      <RouteWatcher />
+      <IonSplitPane contentId="main-content">
+        <MainMenu />
+        <IonRouterOutlet id="main-content">
+          <Switch>
             {/* Public — auth pages */}
             <Route exact path="/login"><LoginPage /></Route>
             <Route exact path="/signup"><SignupPage /></Route>
@@ -116,9 +80,17 @@ const App: React.FC = () => (
             <Route exact path="/my/events"><ProtectedRoute><MyEventsPage /></ProtectedRoute></Route>
 
             <Route exact path="/"><Redirect to="/explore" /></Route>
-          </IonRouterOutlet>
-        </IonSplitPane>
-      </IonReactRouter>
+          </Switch>
+        </IonRouterOutlet>
+      </IonSplitPane>
+    </IonReactRouter>
+  )
+}
+
+const App: React.FC = () => (
+  <IonApp>
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   </IonApp>
 )

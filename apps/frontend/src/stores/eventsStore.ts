@@ -1,15 +1,15 @@
+import type { Attendee, Event, MyEventsFilter } from '../types/event.types'
 import { create } from 'zustand'
-import type { EventData, Attendee, MyEventsFilter } from '../services/events'
-import * as eventsApi from '../services/events'
+import { eventRepository } from '../repositories/EventRepository'
 
 // ── State shape ────────────────────────────────────────────────────
 
 export interface EventsStore {
   // Data
-  events: EventData[]
-  currentEvent: EventData | null
+  events: Event[]
+  currentEvent: Event | null
   attendees: Attendee[]
-  myEvents: EventData[]
+  myEvents: Event[]
 
   // UI state
   loading: boolean
@@ -23,10 +23,10 @@ export interface EventsStore {
 
   // Actions — CRUD
   fetchEvent: (id: string) => Promise<void>
-  createEvent: (data: Parameters<typeof eventsApi.createEvent>[0]) => Promise<EventData | null>
-  updateEvent: (id: string, data: Record<string, unknown>) => Promise<EventData | null>
+  createEvent: (data: any) => Promise<Event | null>
+  updateEvent: (id: string, data: Record<string, unknown>) => Promise<Event | null>
   deleteEvent: (id: string) => Promise<boolean>
-  cancelEvent: (id: string) => Promise<EventData | null>
+  cancelEvent: (id: string) => Promise<Event | null>
 
   // Actions — RSVP
   rsvp: (eventId: string) => Promise<void>
@@ -37,13 +37,15 @@ export interface EventsStore {
   fetchMyEvents: (filter?: MyEventsFilter) => Promise<void>
 
   // Actions — Upload
+  // Note: Upload URL is a direct infrastructure call, can stay as is or move to a service.
+  // For now we will keep it as a direct call or use a separate service to avoid polluting the Repository.
   getUploadUrl: (eventId: string, contentType?: string) => Promise<{ uploadUrl: string, key: string } | null>
 
   // State resets
   resetFormState: () => void
   resetRsvpState: () => void
   clearError: () => void
-  setCurrentEvent: (event: EventData | null) => void
+  setCurrentEvent: (event: Event | null) => void
 }
 
 // ── Store ──────────────────────────────────────────────────────────
@@ -65,30 +67,10 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
 
   // ── Fetch single event ─────────────────────────────────────────
   fetchEvent: async (id: string) => {
-    // Events don't have a dedicated GET /:id endpoint.
-    // We can reuse getMyEvents or fetch a specific event via the attendees list.
-    // For now, we fetch the event via the myEvents endpoint as a workaround
-    // or use getMyEvents('all') and find by id.
-    // Actually, let's re-fetch from myEvents and find the matching event.
     set({ loading: true, error: null })
     try {
-      const all = await eventsApi.getMyEvents('all')
-      const found = all.find(e => e.id === id)
-      if (found) {
-        set({ currentEvent: found, loading: false })
-      }
-      else {
-        // If not in myEvents, try fetching from the event detail
-        // via getAttendees which validates the event exists
-        try {
-          await eventsApi.getAttendees(id)
-          // Event exists; we don't have full data but can create a placeholder
-          // This is a limitation; ideally there'd be a GET /api/events/:id endpoint
-        }
-        catch {
-          set({ error: 'Event not found', loading: false })
-        }
-      }
+      const event = await eventRepository.getEventById(id)
+      set({ currentEvent: event, loading: false })
     }
     catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch event'
@@ -100,7 +82,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   createEvent: async (data) => {
     set({ formState: { isSubmitting: true, isSuccess: false, error: null } })
     try {
-      const event = await eventsApi.createEvent(data)
+      const event = await eventRepository.createEvent(data)
       set(state => ({
         events: [...state.events, event],
         myEvents: [...state.myEvents, event],
@@ -119,7 +101,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   updateEvent: async (id, data) => {
     set({ formState: { isSubmitting: true, isSuccess: false, error: null } })
     try {
-      const updated = await eventsApi.updateEvent(id, data)
+      const updated = await eventRepository.updateEvent(id, data)
       set(state => ({
         currentEvent: updated,
         events: state.events.map(e => (e.id === id ? updated : e)),
@@ -139,7 +121,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   deleteEvent: async (id) => {
     set({ loading: true, error: null })
     try {
-      await eventsApi.deleteEvent(id)
+      await eventRepository.deleteEvent(id)
       set(state => ({
         events: state.events.filter(e => e.id !== id),
         myEvents: state.myEvents.filter(e => e.id !== id),
@@ -159,7 +141,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   cancelEvent: async (id) => {
     set({ loading: true, error: null })
     try {
-      const cancelled = await eventsApi.cancelEvent(id)
+      const cancelled = await eventRepository.cancelEvent(id)
       set(state => ({
         currentEvent: cancelled,
         events: state.events.map(e => (e.id === id ? cancelled : e)),
@@ -179,7 +161,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   rsvp: async (eventId) => {
     set({ rsvpState: 'loading' })
     try {
-      await eventsApi.rsvp(eventId)
+      await eventRepository.rsvpToEvent(eventId)
       // Refresh the event to get updated status
       const { fetchEvent } = get()
       await fetchEvent(eventId)
@@ -195,7 +177,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   leave: async (eventId) => {
     set({ rsvpState: 'loading' })
     try {
-      await eventsApi.leave(eventId)
+      await eventRepository.leaveEvent(eventId)
       const { fetchEvent, fetchAttendees } = get()
       await fetchEvent(eventId)
       await fetchAttendees(eventId)
@@ -211,7 +193,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   fetchAttendees: async (eventId) => {
     set({ loading: true, error: null })
     try {
-      const attendees = await eventsApi.getAttendees(eventId)
+      const attendees = await eventRepository.getAttendees(eventId)
       set({ attendees, loading: false })
     }
     catch (err: unknown) {
@@ -224,7 +206,7 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   fetchMyEvents: async (filter = 'all') => {
     set({ loading: true, error: null })
     try {
-      const events = await eventsApi.getMyEvents(filter)
+      const events = await eventRepository.getMyEvents(filter)
       set({ myEvents: events, loading: false })
     }
     catch (err: unknown) {
@@ -236,7 +218,10 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   // ── Get upload URL ─────────────────────────────────────────────
   getUploadUrl: async (eventId, contentType) => {
     try {
-      return await eventsApi.getUploadUrl(eventId, contentType)
+      // For upload URLs, we call the service directly as it's an infrastructure detail
+      // and doesn't involve a domain entity mapping.
+      const { getUploadUrl } = await import('../services/events')
+      return await getUploadUrl(eventId, contentType)
     }
     catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to get upload URL'
@@ -251,5 +236,5 @@ export const useEventsStore = create<EventsStore>((set, get) => ({
   }),
   resetRsvpState: () => set({ rsvpState: 'idle' }),
   clearError: () => set({ error: null }),
-  setCurrentEvent: (event) => set({ currentEvent: event }),
+  setCurrentEvent: event => set({ currentEvent: event }),
 }))
