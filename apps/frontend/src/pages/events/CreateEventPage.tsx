@@ -1,22 +1,20 @@
 import {
   IonButton,
+  IonDatetime,
   IonInput,
   IonItem,
   IonLabel,
+  IonRange,
   IonSelect,
   IonSelectOption,
+  IonSpinner,
   IonText,
   IonTextarea,
-  IonDatetime,
-  IonRange,
-  IonSpinner,
 } from '@ionic/react'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'react-router-dom'
-import { useAuth } from '../../components/auth/AuthProvider'
-import { ProtectedRoute } from '../../components/auth/ProtectedRoute'
-import { AppLayout } from '../../components/layout/AppLayout'
 import { ImageUpload } from '../../components/events/ImageUpload'
+import { AppLayout } from '../../components/layout/AppLayout'
 import { useEventsStore } from '../../stores/eventsStore'
 
 // ── Validation helpers ────────────────────────────────────────────
@@ -29,6 +27,7 @@ export interface FormErrors {
   plannedGames?: string
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function validateCreateEventForm(data: {
   title: string
   address: string
@@ -72,31 +71,36 @@ export function validateCreateEventForm(data: {
 
 export function CreateEventPage() {
   return (
-    <ProtectedRoute>
-      <AppLayout title="Create Event">
-        <CreateEventForm />
-      </AppLayout>
-    </ProtectedRoute>
+    <AppLayout title="Create Event">
+      <CreateEventForm />
+    </AppLayout>
   )
 }
 
 function CreateEventForm() {
-  const { user } = useAuth()
-  const { createEvent, getUploadUrl, formState, resetFormState } = useEventsStore()
+  const { createEvent, formState, resetFormState } = useEventsStore()
 
   const [title, setTitle] = useState('')
   const [address, setAddress] = useState('')
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(() => new Date().toISOString())
   const [capacity, setCapacity] = useState(4)
   const [plannedGames, setPlannedGames] = useState('')
   const [skillLevel, setSkillLevel] = useState<string | undefined>(undefined)
   const [atmosphere, setAtmosphere] = useState('')
-  const [imageKey, setImageKey] = useState<string | null>(null)
+  const [_imageKey, setImageKey] = useState<string | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
 
-  // Redirect on success
-  if (formState.isSuccess) {
-    const timer = setTimeout(() => resetFormState(), 0)
+  const [shouldRedirect, setShouldRedirect] = useState(false)
+  const minDate = useMemo(() => new Date(Date.now() + 3600000).toISOString(), [])
+
+  useEffect(() => {
+    if (formState.isSuccess) {
+      resetFormState()
+      setShouldRedirect(true)
+    }
+  }, [formState.isSuccess, resetFormState])
+
+  if (shouldRedirect) {
     return <Redirect to="/my/events" />
   }
 
@@ -106,7 +110,8 @@ function CreateEventForm() {
     // Validate
     const validationErrors = validateCreateEventForm({ title, address, date, capacity })
     setErrors(validationErrors)
-    if (Object.keys(validationErrors).length > 0) return
+    if (Object.keys(validationErrors).length > 0)
+      return
 
     // Parse date to Unix ms
     const dateMs = new Date(date).getTime()
@@ -126,12 +131,7 @@ function CreateEventForm() {
     })
   }
 
-  const handleUploadUrl = async (contentType: string) => {
-    // We need the event ID, but on create we don't have one yet.
-    // In a real app, we'd create the event first, then upload the image.
-    // For now, store the image key and submit it with the form.
-    // Since createEvent doesn't accept imageKey, we store it for later use.
-    // This is a known limitation — image upload is deferred to after creation.
+  const handleUploadUrl = async (_contentType: string) => {
     return null
   }
 
@@ -181,7 +181,7 @@ function CreateEventForm() {
             presentation="date-time"
             value={date}
             onIonChange={e => setDate(e.detail.value as string)}
-            min={new Date(Date.now() + 3600000).toISOString()}
+            min={minDate}
             style={{ width: '100%' }}
           />
         </IonItem>

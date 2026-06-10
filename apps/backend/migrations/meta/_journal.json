@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1780865455372,
-      "tag": "0000_redundant_celestials",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1780934258942,
-      "tag": "0001_absent_vapor",
+      "when": 1780935488763,
+      "tag": "0000_sturdy_hannibal_king",
       "breakpoints": true
     }
   ]

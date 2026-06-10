@@ -15,6 +15,7 @@ openspec/
 
 # Testing
 coverage/
+.playwright-mcp/
 
 # Misc
 .DS_Store
