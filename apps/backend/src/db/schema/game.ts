@@ -27,6 +27,17 @@ export const insertGameSchema = createInsertSchema(game, {
   minPlayers: schema => schema.min(1).max(99),
   maxPlayers: schema => schema.min(1).max(99),
   duration: schema => schema.min(0).max(1440),
-})
+}).refine(
+  (data) => {
+    if (data.minPlayers != null && data.maxPlayers != null) {
+      return data.maxPlayers >= data.minPlayers
+    }
+    return true
+  },
+  {
+    message: 'maxPlayers must be greater than or equal to minPlayers',
+    path: ['maxPlayers'],
+  },
+)
 
 export const selectGameSchema = createSelectSchema(game)
