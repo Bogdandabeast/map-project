@@ -23,6 +23,9 @@ import { MapPage } from './pages/MapPage'
 import { MyProfilePage } from './pages/Profile/MyProfilePage'
 import { PublicProfilePage } from './pages/Profile/PublicProfilePage'
 import { SettingsPage } from './pages/Profile/SettingsPage'
+import { BrowseGamesPage } from './pages/BrowseGamesPage'
+import { GameDetailPage } from './pages/GameDetailPage'
+import { GameSearchPage } from './pages/GameSearchPage'
 
 import '@ionic/react/css/core.css'
 import '@ionic/react/css/normalize.css'
@@ -80,6 +83,11 @@ function AppContent() {
             <Route exact path="/events/create"><ProtectedRoute><CreateEventPage /></ProtectedRoute></Route>
             <Route exact path="/events/:id"><ProtectedRoute><EventDetailPage /></ProtectedRoute></Route>
             <Route exact path="/my/events"><ProtectedRoute><MyEventsPage /></ProtectedRoute></Route>
+
+            {/* Game Catalog — requires session */}
+            <Route exact path="/games/browse"><ProtectedRoute><BrowseGamesPage /></ProtectedRoute></Route>
+            <Route exact path="/games/search"><ProtectedRoute><GameSearchPage /></ProtectedRoute></Route>
+            <Route exact path="/games/:id"><ProtectedRoute><GameDetailPage /></ProtectedRoute></Route>
 
             <Route exact path="/"><Redirect to="/explore" /></Route>
           </Switch>

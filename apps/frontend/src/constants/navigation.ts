@@ -2,6 +2,7 @@ import {
   addCircleOutline,
   calendarOutline,
   compassOutline,
+  gridOutline,
   logInOutline,
   mapOutline,
   personAddOutline,
@@ -20,6 +21,8 @@ export interface MenuItem {
 export const menuItems: MenuItem[] = [
   { path: '/explore', icon: compassOutline, label: 'Explorar', auth: true },
   { path: '/map', icon: mapOutline, label: 'Mapa', auth: true },
+  { path: '/games/browse', icon: gridOutline, label: 'Catálogo', auth: true },
+  { path: '/games/search', icon: searchOutline, label: 'Buscar juegos', auth: true },
   { path: '/my/events', icon: calendarOutline, label: 'Mis eventos', auth: true },
   { path: '/events/create', icon: addCircleOutline, label: 'Crear evento', auth: true },
   { path: '/profile', icon: personOutline, label: 'Perfil', auth: true },
