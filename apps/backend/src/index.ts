@@ -9,6 +9,9 @@ import { eventRoutes } from './routes/events/events.routes'
 import { uploadRoutes } from './routes/events/upload.routes'
 import { attendeeRoutes } from './routes/events/attendees.routes'
 import { meRoutes } from './routes/events/me.routes'
+import { gameSearchRoutes } from './routes/game-search'
+import { gameDetailRoutes } from './routes/game-detail'
+import { gameBrowseRoutes } from './routes/game-browse'
 
 const app = new Hono<AppEnv>()
 
@@ -46,5 +49,10 @@ app.route('/api/events', eventRoutes)
 app.route('/api/events', uploadRoutes)
 app.route('/api/events', attendeeRoutes)
 app.route('/api/me/events', meRoutes)
+
+// Game catalog — mounted under /api/games
+app.route('/api/games', gameSearchRoutes)
+app.route('/api/games', gameDetailRoutes)
+app.route('/api/games', gameBrowseRoutes)
 
 export default app
