@@ -44,7 +44,7 @@ setupIonicReact()
 
 /** TODO: implement route-change tracking (analytics, page-view side-effects) */
 
-function _RouteWatcher() {
+function RouteWatcher() {
   return null
 }
 

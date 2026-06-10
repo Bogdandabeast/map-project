@@ -51,8 +51,10 @@ app.route('/api/events', attendeeRoutes)
 app.route('/api/me/events', meRoutes)
 
 // Game catalog — mounted under /api/games
+// IMPORTANT: specific routes (/search, /popular, /recent) MUST be before
+// parameterized route (/:id) to avoid :id matching "popular"/"recent"/"search"
 app.route('/api/games', gameSearchRoutes)
-app.route('/api/games', gameDetailRoutes)
 app.route('/api/games', gameBrowseRoutes)
+app.route('/api/games', gameDetailRoutes)
 
 export default app
