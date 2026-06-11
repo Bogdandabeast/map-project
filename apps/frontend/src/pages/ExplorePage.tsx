@@ -122,6 +122,9 @@ export function ExplorePage() {
                   if (mode === 'global') {
                     setHasSearched(true)
                     search({ center, radiusKm: searchRadius })
+                  } else {
+                    // Clear stale global results when switching to nearby
+                    useMapStore.getState().setSearchResults([])
                   }
                 }
               }}

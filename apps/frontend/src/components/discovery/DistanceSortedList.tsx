@@ -55,13 +55,9 @@ export function DistanceSortedList({ results }: DistanceSortedListProps) {
               <IonNote>{formatDate(result.event.date)}</IonNote>
             </p>
             <div style={{ marginTop: '6px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-              {result.distanceKm != null ? (
+              {result.distanceKm != null && (
                 <IonChip color="primary" outline>
                   {formatDistance(result.distanceKm)}
-                </IonChip>
-              ) : (
-                <IonChip color="medium" outline>
-                  {formatDate(result.event.date)}
                 </IonChip>
               )}
               {result.event.games.map(game => (

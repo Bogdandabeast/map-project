@@ -121,12 +121,14 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     }
 
     const parts = bbox.split(',').map(Number)
-    if (parts.length !== 4 || parts.some(isNaN)) {
-      return c.json({ error: 'bbox must be four comma-separated numbers' }, 400)
+    if (parts.length !== 4 || parts.some(n => !Number.isFinite(n))) {
+      return c.json({ error: 'bbox must be four comma-separated finite numbers' }, 400)
     }
 
     const [minLng, minLat, maxLng, maxLat] = parts
     const db = getDb(c.env)
+
+    const MAX_EVENTS = 500
 
     const found = await db
       .select()
@@ -136,6 +138,8 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
             AND ${events.lng} >= ${minLng} AND ${events.lng} <= ${maxLng}
             AND ${events.status} != 'cancelled'`,
       )
+      .orderBy(desc(events.date))
+      .limit(MAX_EVENTS)
       .all()
 
     // Map to response shape matching existing event response format
@@ -165,6 +169,9 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
       }
     })
 
+    if (found.length === MAX_EVENTS) {
+      c.header('X-Truncated', 'true')
+    }
     return c.json(mapped)
   })
 

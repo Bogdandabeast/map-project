@@ -13,21 +13,26 @@ import Translate from 'ol/interaction/Translate'
 import { useMapStore } from '../map/model/stores/mapStore'
 
 export interface LocationPickerProps {
-  /** Initial center [lng, lat]. Defaults to mapStore.center */
+  /** Initial center [lat, lng]. Converted to [lng, lat] before passing to OpenLayers. Defaults to mapStore.center (already [lng, lat]). */
   initialCenter?: [number, number]
   /** External center [lng, lat] to move the pin to (e.g., from address search) */
   externalCenter?: [number, number] | null
-  /** Callback fired when the pin position changes (after drag ends) */
+  /** Callback fired when the pin position changes (after drag ends) — receives (lat, lng) */
   onLocationChange: (lat: number, lng: number) => void
 }
 
 /**
  * Self-contained OpenLayers mini-map with a draggable pin.
  *
- * - Default center comes from `mapStore.center` or the `initialCenter` prop.
+ * - Default center comes from `mapStore.center` ([lng, lat]) or the `initialCenter` prop ([lat, lng]).
  * - Pin starts at the map center and can be dragged.
  * - `onLocationChange` fires after each drag with `(lat, lng)`.
  * - No global store dependency for the OL instance — fully isolated.
+ *
+ * ## Coordinate convention
+ * - `initialCenter` is **[lat, lng]** (matches `onLocationChange` signature).
+ * - `externalCenter` is **[lng, lat]** (for direct OpenLayers consumption).
+ * - Internally, the component works in [lng, lat] (OpenLayers convention).
  */
 export function LocationPicker({ initialCenter, externalCenter, onLocationChange }: LocationPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -37,9 +42,12 @@ export function LocationPicker({ initialCenter, externalCenter, onLocationChange
   // Track whether this is the initial pin placement (first render)
   const initialPinSet = useRef(false)
 
-  // Read store center as fallback
+  // Read store center as fallback (store center is [lng, lat])
   const storeCenter = useMapStore(s => s.center)
-  const center = initialCenter ?? storeCenter
+  // initialCenter is [lat, lng] in the public API — convert to [lng, lat] for OpenLayers
+  const center: [number, number] = initialCenter
+    ? [initialCenter[1], initialCenter[0]]
+    : storeCenter
 
   // Stable callback ref to avoid re-creating interactions
   const onLocationChangeRef = useRef(onLocationChange)
@@ -57,6 +65,13 @@ export function LocationPicker({ initialCenter, externalCenter, onLocationChange
     const coords = geom.getCoordinates()
     if (!coords) return
     const [lng, lat] = toLonLat(coords)
+
+    // Validate coordinate ranges — reject out-of-bounds values
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      console.warn(`[LocationPicker] Invalid coordinates: lat=${lat}, lng=${lng}`)
+      return
+    }
+
     setCoords([lat, lng])
     onLocationChangeRef.current(lat, lng)
   }, [])
@@ -128,10 +143,22 @@ export function LocationPicker({ initialCenter, externalCenter, onLocationChange
     map.addInteraction(translate)
     mapRef.current = map
 
+    // ResizeObserver: update map size when container resizes
+    const observer = new ResizeObserver(() => {
+      map.updateSize()
+    })
+    observer.observe(containerRef.current)
+
+    // Window resize fallback
+    const handleWindowResize = () => map.updateSize()
+    window.addEventListener('resize', handleWindowResize)
+
     // Notify initial position
     notifyCoords()
 
     return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', handleWindowResize)
       map.setTarget(undefined)
       mapRef.current = null
     }

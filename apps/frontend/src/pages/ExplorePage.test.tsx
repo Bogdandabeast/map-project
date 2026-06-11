@@ -26,13 +26,15 @@ mock.module('../components/auth/AuthProvider', () => ({
   }),
 }))
 
-// ── Mock useRadarSearch to read from store ────────────────────────────
+// ── Mock useRadarSearch — tracks search calls ─────────────────────────
+
+const searchImpl = { current: (_params?: unknown) => {} }
 
 mock.module('../hooks/useRadarSearch', () => ({
   useRadarSearch: () => {
     const state = useMapStore.getState()
     return {
-      search: () => { /* no-op — trigger is tested via button click */ },
+      search: (...args: unknown[]) => { searchImpl.current(...args) },
       isLoading: state.isLoading,
       error: state.error,
       results: state.searchResults,
@@ -64,6 +66,7 @@ const DEFAULT_STORE = {
 beforeEach(() => {
   useMapStore.setState({ ...DEFAULT_STORE })
   eventsPassedToMapView = undefined
+  searchImpl.current = mock(() => {})
 })
 
 afterEach(() => {
@@ -281,5 +284,61 @@ describe('ExplorePage', () => {
     const button = screen.getByTestId('search-here-button')
     // When isLoading=false, disabled prop is undefined → no disabled attribute
     expect(button.hasAttribute('disabled')).toBe(false)
+  })
+
+  // ── Search mode toggle ──────────────────────────────────────────
+
+  it('renders the search mode toggle with both buttons', () => {
+    render(<ExplorePage />)
+    expect(screen.getByTestId('search-mode-toggle')).toBeInTheDocument()
+    expect(screen.getByTestId('mode-nearby')).toBeInTheDocument()
+    expect(screen.getByTestId('mode-global')).toBeInTheDocument()
+  })
+
+  it('switches to global mode and triggers search', () => {
+    render(<ExplorePage />)
+
+    const segment = screen.getByTestId('search-mode-toggle')
+    Object.defineProperty(segment, 'value', {
+      value: 'global',
+      writable: true,
+      configurable: true,
+    })
+    fireEvent(segment, new CustomEvent('ionChange', { bubbles: true }))
+
+    expect(useMapStore.getState().searchMode).toBe('global')
+    expect(searchImpl.current).toHaveBeenCalled()
+  })
+
+  it('switches to nearby mode without triggering search', () => {
+    // Start from global mode
+    useMapStore.setState({ searchMode: 'global' })
+    render(<ExplorePage />)
+
+    const segment = screen.getByTestId('search-mode-toggle')
+    Object.defineProperty(segment, 'value', {
+      value: 'nearby',
+      writable: true,
+      configurable: true,
+    })
+    fireEvent(segment, new CustomEvent('ionChange', { bubbles: true }))
+
+    expect(useMapStore.getState().searchMode).toBe('nearby')
+    // Search should NOT be called when switching to nearby (stale results are cleared instead)
+    expect(searchImpl.current).not.toHaveBeenCalled()
+  })
+
+  it('hides the search-here button in global mode', () => {
+    useMapStore.setState({ searchMode: 'global' })
+    render(<ExplorePage />)
+
+    expect(screen.queryByTestId('search-here-button')).not.toBeInTheDocument()
+  })
+
+  it('shows the search-here button in nearby mode', () => {
+    useMapStore.setState({ searchMode: 'nearby' })
+    render(<ExplorePage />)
+
+    expect(screen.getByTestId('search-here-button')).toBeInTheDocument()
   })
 })

@@ -54,7 +54,6 @@ export function useRadarSearch() {
   const isLoading = useMapStore(s => s.isLoading)
   const error = useMapStore(s => s.error)
   const results = useMapStore(s => s.searchResults)
-  const searchMode = useMapStore(s => s.searchMode)
   const { setIsLoading, setError, setSearchResults } = useMapStore.getState()
 
   const search = useCallback(async (params: SearchParams) => {
@@ -62,9 +61,10 @@ export function useRadarSearch() {
     setError(null)
 
     try {
+      const currentMode = useMapStore.getState().searchMode
       let url: string
 
-      if (searchMode === 'global') {
+      if (currentMode === 'global') {
         url = `${API_URL}/api/events?all=true`
       } else {
         const bbox = radiusToBbox(params.center, params.radiusKm)
@@ -81,7 +81,7 @@ export function useRadarSearch() {
       const events: EventData[] = await response.json()
       const markers = events.map(toEventMarker)
 
-      if (searchMode === 'global') {
+      if (currentMode === 'global') {
         // Global mode: sort by date descending, no distance
         const results: SearchResult[] = markers
           .sort((a, b) => b.date - a.date)
@@ -110,7 +110,7 @@ export function useRadarSearch() {
     finally {
       setIsLoading(false)
     }
-  }, [setIsLoading, setError, setSearchResults, searchMode])
+  }, [setIsLoading, setError, setSearchResults])
 
   return { search, isLoading, error, results }
 }
