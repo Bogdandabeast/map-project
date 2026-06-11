@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { IonButton, IonIcon, IonSegment, IonSegmentButton } from '@ionic/react'
 import { globeOutline, searchOutline } from 'ionicons/icons'
 import { AppLayout } from '../components/layout/AppLayout'
+import { AddressSearch } from '../components/discovery/AddressSearch'
 import { EmptyResults } from '../components/discovery/EmptyResults'
 import { FilterChips } from '../components/discovery/FilterChips'
 import { DistanceSortedList } from '../components/discovery/DistanceSortedList'
@@ -25,6 +26,7 @@ export function ExplorePage() {
   const searchMode = useMapStore(s => s.searchMode)
   const filters = useMapStore(s => s.filters)
   const setSearchMode = useMapStore(s => s.setSearchMode)
+  const setCenter = useMapStore(s => s.setCenter)
 
   // Radar search hook: provides search(), isLoading, error, results
   const { search, isLoading, error, results } = useRadarSearch()
@@ -96,6 +98,18 @@ export function ExplorePage() {
 
         {/* Discovery panel: bottom sheet on mobile, sidebar on desktop */}
         <div className="discovery-panel" data-testid="discovery-panel">
+          {/* Address search — move map and trigger radar search */}
+          <div style={{ padding: '0 16px' }}>
+            <AddressSearch
+              onSelect={(result) => {
+                const newCenter: [number, number] = [result.lng, result.lat]
+                setCenter(newCenter)
+                setHasSearched(true)
+                search({ center: newCenter, radiusKm: searchRadius })
+              }}
+            />
+          </div>
+
           {/* Search mode toggle */}
           <div style={{ padding: '8px 16px' }}>
             <IonSegment
