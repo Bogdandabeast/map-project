@@ -15,6 +15,8 @@ import { useMapStore } from '../map/model/stores/mapStore'
 export interface LocationPickerProps {
   /** Initial center [lng, lat]. Defaults to mapStore.center */
   initialCenter?: [number, number]
+  /** External center [lng, lat] to move the pin to (e.g., from address search) */
+  externalCenter?: [number, number] | null
   /** Callback fired when the pin position changes (after drag ends) */
   onLocationChange: (lat: number, lng: number) => void
 }
@@ -27,7 +29,7 @@ export interface LocationPickerProps {
  * - `onLocationChange` fires after each drag with `(lat, lng)`.
  * - No global store dependency for the OL instance — fully isolated.
  */
-export function LocationPicker({ initialCenter, onLocationChange }: LocationPickerProps) {
+export function LocationPicker({ initialCenter, externalCenter, onLocationChange }: LocationPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
   const pinRef = useRef<Feature | null>(null)
@@ -67,6 +69,15 @@ export function LocationPicker({ initialCenter, onLocationChange }: LocationPick
     initialPinSet.current = true
     notifyCoords()
   }, [center, notifyCoords])
+
+  // Move pin when externalCenter changes (e.g., from address search)
+  useEffect(() => {
+    if (!externalCenter || !pinRef.current || !viewRef.current) return
+    const projCenter = fromLonLat(externalCenter)
+    pinRef.current.getGeometry()?.setCoordinates(projCenter)
+    viewRef.current.setCenter(projCenter)
+    notifyCoords()
+  }, [externalCenter, notifyCoords])
 
   // Create map on mount
   useEffect(() => {

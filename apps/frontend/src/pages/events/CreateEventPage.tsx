@@ -14,6 +14,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { ImageUpload } from '../../components/events/ImageUpload'
+import { AddressSearch } from '../../components/discovery/AddressSearch'
 import { LocationPicker } from '../../components/discovery/LocationPicker'
 import { AppLayout } from '../../components/layout/AppLayout'
 import { useEventsStore } from '../../stores/eventsStore'
@@ -93,6 +94,8 @@ function CreateEventForm() {
   const [createdEventId, setCreatedEventId] = useState<string | null>(null)
   const [lat, setLat] = useState<number | undefined>(undefined)
   const [lng, setLng] = useState<number | undefined>(undefined)
+  // External center from address search — moves the map pin
+  const [externalCenter, setExternalCenter] = useState<[number, number] | null>(null)
 
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const minDate = useMemo(() => new Date(Date.now() + 3600000).toISOString(), [])
@@ -125,7 +128,6 @@ function CreateEventForm() {
       address: address.trim(),
       lat,
       lng,
-      // TODO: implement geocoding — remove optional omission when implemented
       date: dateMs,
       capacity,
       plannedGames: plannedGames.trim()
@@ -152,8 +154,19 @@ function CreateEventForm() {
     <div style={{ padding: '1rem', maxWidth: '600px', margin: '0 auto' }}>
       <h1 data-testid="create-event-title">Create event</h1>
 
+      {/* Address search via Nominatim — replaces manual address input */}
+      <AddressSearch
+        onSelect={(result) => {
+          setAddress(result.displayName)
+          setLat(result.lat)
+          setLng(result.lng)
+          setExternalCenter([result.lng, result.lat])
+        }}
+      />
+
       {/* Location Picker — draggable pin mini-map */}
       <LocationPicker
+        externalCenter={externalCenter}
         onLocationChange={(newLat: number, newLng: number) => {
           setLat(newLat)
           setLng(newLng)
@@ -178,10 +191,11 @@ function CreateEventForm() {
           </IonText>
         )}
 
-        {/* Address */}
+        {/* Address (auto-filled by AddressSearch) */}
         <IonItem>
           <IonLabel position="stacked">Address *</IonLabel>
           <IonInput
+            data-testid="create-event-address-input"
             data-testid="create-event-address-input"
             value={address}
             required
