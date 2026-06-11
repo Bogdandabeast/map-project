@@ -735,4 +735,109 @@ describe('Events API Integration', () => {
       expect(events.length).toBeGreaterThanOrEqual(1)
     })
   })
+
+  // ── Global search (?all=true) ────────────────────────────────────
+
+  describe('GET /api/events?all=true (global search)', () => {
+    test('?all=true returns events without requiring bbox', async () => {
+      if (!createEventRoutes) return
+
+      const app = buildTestApp(handle.db, creatorUser)
+
+      // Create 3 events
+      for (let i = 0; i < 3; i++) {
+        await app.request('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(createEventBody({ title: `Event ${i}`, date: futureDate + i * 1000 })),
+        })
+      }
+
+      const optionalAuth = () => ({
+        api: { async getSession(_o: unknown) { return null } },
+      })
+      const pubApp = new Hono<AppEnv>()
+      const routes = createEventRoutes({ authFactory: optionalAuth, getDb: testGetDb(handle.db) })
+      pubApp.route('/api/events', routes)
+
+      const res = await pubApp.request('/api/events?all=true')
+      expect(res.status).toBe(200)
+
+      const events = await res.json()
+      expect(Array.isArray(events)).toBe(true)
+      expect(events.length).toBe(3)
+    })
+
+    test('?all=true returns events sorted by date descending', async () => {
+      if (!createEventRoutes) return
+
+      const app = buildTestApp(handle.db, creatorUser)
+
+      const e1 = await app.request('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createEventBody({ title: 'Earlier', date: futureDate })),
+      })
+      expect(e1.status).toBe(201)
+
+      const e2 = await app.request('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createEventBody({ title: 'Later', date: futureDate + 86400000 })),
+      })
+      expect(e2.status).toBe(201)
+
+      const optionalAuth = () => ({
+        api: { async getSession(_o: unknown) { return null } },
+      })
+      const pubApp = new Hono<AppEnv>()
+      const routes = createEventRoutes({ authFactory: optionalAuth, getDb: testGetDb(handle.db) })
+      pubApp.route('/api/events', routes)
+
+      const res = await pubApp.request('/api/events?all=true')
+      expect(res.status).toBe(200)
+
+      const events = await res.json()
+      expect(events.length).toBe(2)
+      // Later date should come first (descending)
+      expect(events[0].date).toBeGreaterThanOrEqual(events[1].date)
+    })
+
+    test('?all=true excludes cancelled events', async () => {
+      if (!createEventRoutes) return
+
+      const app = buildTestApp(handle.db, creatorUser)
+
+      const createRes = await app.request('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createEventBody({ title: 'Cancelled' })),
+      })
+      const created = await createRes.json()
+
+      // Cancel the event
+      await app.request(`/api/events/${created.id}/cancel`, { method: 'POST' })
+
+      // Create another event
+      await app.request('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createEventBody({ title: 'Active' })),
+      })
+
+      const optionalAuth = () => ({
+        api: { async getSession(_o: unknown) { return null } },
+      })
+      const pubApp = new Hono<AppEnv>()
+      const routes = createEventRoutes({ authFactory: optionalAuth, getDb: testGetDb(handle.db) })
+      pubApp.route('/api/events', routes)
+
+      const res = await pubApp.request('/api/events?all=true')
+      expect(res.status).toBe(200)
+
+      const events = await res.json()
+      expect(events.length).toBe(1)
+      expect(events[0].title).toBe('Active')
+    })
+  })
 })
