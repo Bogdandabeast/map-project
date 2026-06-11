@@ -15,7 +15,8 @@ export const useMapStore = create<MapStore>(set => ({
   map: null,
   center: [-3.7038, 40.4168],
   zoom: 6,
-  searchRadius: 5,
+  searchRadius: 20,
+  searchMode: 'nearby',
   searchResults: [],
   filters: { ...DEFAULT_FILTERS },
   isLoading: false,
@@ -57,6 +58,15 @@ export const useMapStore = create<MapStore>(set => ({
     set((state) => {
       if (radius <= 0) return state
       return Math.abs(state.searchRadius - radius) < EPSILON ? state : { searchRadius: radius }
+    }),
+
+  /**
+   * Sets the search mode: 'nearby' (bbox + haversine) or 'global' (all by date)
+   * @param mode 'nearby' | 'global'
+   */
+  setSearchMode: mode =>
+    set((state) => {
+      return state.searchMode === mode ? state : { searchMode: mode }
     }),
 
   /**

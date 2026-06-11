@@ -43,5 +43,6 @@ export interface FilterState {
  */
 export interface SearchResult {
   event: EventMarker
-  distanceKm: number
+  /** Distance in kilometers from search center. Undefined in global mode. */
+  distanceKm?: number
 }

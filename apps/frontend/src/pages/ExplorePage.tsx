@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
-import { IonButton, IonIcon } from '@ionic/react'
-import { searchOutline } from 'ionicons/icons'
+import { IonButton, IonIcon, IonSegment, IonSegmentButton } from '@ionic/react'
+import { globeOutline, searchOutline } from 'ionicons/icons'
 import { AppLayout } from '../components/layout/AppLayout'
 import { EmptyResults } from '../components/discovery/EmptyResults'
 import { FilterChips } from '../components/discovery/FilterChips'
@@ -22,7 +22,9 @@ export function ExplorePage() {
   // Reactive store slices
   const center = useMapStore(s => s.center)
   const searchRadius = useMapStore(s => s.searchRadius)
+  const searchMode = useMapStore(s => s.searchMode)
   const filters = useMapStore(s => s.filters)
+  const setSearchMode = useMapStore(s => s.setSearchMode)
 
   // Radar search hook: provides search(), isLoading, error, results
   const { search, isLoading, error, results } = useRadarSearch()
@@ -73,25 +75,52 @@ export function ExplorePage() {
         <div className="map-wrapper">
           <MapView events={eventMarkers} />
 
-          {/* Floating search button */}
-          <div className="ui-overlay">
-            <div className="search-trigger">
-              <IonButton
-                data-testid="search-here-button"
-                color="primary"
-                size="default"
-                onClick={handleSearch}
-                disabled={isLoading || undefined}
-              >
-                <IonIcon slot="start" icon={searchOutline} />
-                Search here
-              </IonButton>
+          {/* Floating search button — only in Nearby mode */}
+          {searchMode === 'nearby' && (
+            <div className="ui-overlay">
+              <div className="search-trigger">
+                <IonButton
+                  data-testid="search-here-button"
+                  color="primary"
+                  size="default"
+                  onClick={handleSearch}
+                  disabled={isLoading || undefined}
+                >
+                  <IonIcon slot="start" icon={searchOutline} />
+                  Search here
+                </IonButton>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Discovery panel: bottom sheet on mobile, sidebar on desktop */}
         <div className="discovery-panel" data-testid="discovery-panel">
+          {/* Search mode toggle */}
+          <div style={{ padding: '8px 16px' }}>
+            <IonSegment
+              data-testid="search-mode-toggle"
+              value={searchMode}
+              onIonChange={(e) => {
+                const mode = (e.target as HTMLIonSegmentElement).value as 'nearby' | 'global'
+                if (mode && mode !== searchMode) {
+                  setSearchMode(mode)
+                  if (mode === 'global') {
+                    setHasSearched(true)
+                    search({ center, radiusKm: searchRadius })
+                  }
+                }
+              }}
+            >
+              <IonSegmentButton value="nearby" data-testid="mode-nearby">
+                Nearby
+              </IonSegmentButton>
+              <IonSegmentButton value="global" data-testid="mode-global">
+                <IonIcon icon={globeOutline} slot="start" />
+                Global
+              </IonSegmentButton>
+            </IonSegment>
+          </div>
           {content}
         </div>
       </div>

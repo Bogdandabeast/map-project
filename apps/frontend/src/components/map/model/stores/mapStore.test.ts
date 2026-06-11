@@ -12,7 +12,8 @@ describe('useMapStore', () => {
       map: null,
       center: INITIAL_CENTER,
       zoom: INITIAL_ZOOM_LEVEL,
-      searchRadius: 5,
+      searchRadius: 20,
+      searchMode: 'nearby',
       searchResults: [],
       filters: { games: [] },
       isLoading: false,
@@ -33,7 +34,7 @@ describe('useMapStore', () => {
   it('has discovery state with default values', () => {
     const state = useMapStore.getState()
 
-    expect(state.searchRadius).toBe(5)
+    expect(state.searchRadius).toBe(20)
     expect(state.searchResults).toEqual([])
     expect(state.filters).toEqual({ games: [] })
     expect(state.isLoading).toBe(false)
@@ -155,7 +156,7 @@ describe('useMapStore', () => {
     useMapStore.getState().setCenter([-1, 39])
 
     const state = useMapStore.getState()
-    expect(state.searchRadius).toBe(5)
+    expect(state.searchRadius).toBe(20)
     expect(state.isLoading).toBe(false)
   })
 
@@ -251,5 +252,21 @@ describe('useMapStore', () => {
 
     expect(state.zoom).toBe(8)
     expect(state.center).toEqual(INITIAL_CENTER)
+  })
+
+  // ── Search mode ──────────────────────────────────────────────────────
+
+  it('has searchMode defaulting to "nearby"', () => {
+    const state = useMapStore.getState()
+
+    expect(state.searchMode).toBe('nearby')
+  })
+
+  it('setSearchMode updates searchMode', () => {
+    useMapStore.getState().setSearchMode('global')
+    expect(useMapStore.getState().searchMode).toBe('global')
+
+    useMapStore.getState().setSearchMode('nearby')
+    expect(useMapStore.getState().searchMode).toBe('nearby')
   })
 })

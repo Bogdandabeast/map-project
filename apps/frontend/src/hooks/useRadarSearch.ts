@@ -54,6 +54,7 @@ export function useRadarSearch() {
   const isLoading = useMapStore(s => s.isLoading)
   const error = useMapStore(s => s.error)
   const results = useMapStore(s => s.searchResults)
+  const searchMode = useMapStore(s => s.searchMode)
   const { setIsLoading, setError, setSearchResults } = useMapStore.getState()
 
   const search = useCallback(async (params: SearchParams) => {
@@ -61,8 +62,14 @@ export function useRadarSearch() {
     setError(null)
 
     try {
-      const bbox = radiusToBbox(params.center, params.radiusKm)
-      const url = `${API_URL}/api/events?bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`
+      let url: string
+
+      if (searchMode === 'global') {
+        url = `${API_URL}/api/events?all=true`
+      } else {
+        const bbox = radiusToBbox(params.center, params.radiusKm)
+        url = `${API_URL}/api/events?bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}`
+      }
 
       const response = await fetch(url, { credentials: 'include' })
 
@@ -74,19 +81,26 @@ export function useRadarSearch() {
       const events: EventData[] = await response.json()
       const markers = events.map(toEventMarker)
 
-      // Filter by haversine distance and sort
-      const withDistance: SearchResult[] = markers
-        .map((event) => ({
-          event,
-          distanceKm: haversine(
-            params.center[1], params.center[0],
-            event.lat, event.lng,
-          ),
-        }))
-        .filter(r => r.distanceKm <= params.radiusKm)
-        .sort((a, b) => a.distanceKm - b.distanceKm)
-
-      setSearchResults(withDistance)
+      if (searchMode === 'global') {
+        // Global mode: sort by date descending, no distance
+        const results: SearchResult[] = markers
+          .sort((a, b) => b.date - a.date)
+          .map(event => ({ event }))
+        setSearchResults(results)
+      } else {
+        // Nearby mode: filter by haversine distance and sort
+        const withDistance: SearchResult[] = markers
+          .map((event) => ({
+            event,
+            distanceKm: haversine(
+              params.center[1], params.center[0],
+              event.lat, event.lng,
+            ),
+          }))
+          .filter(r => r.distanceKm! <= params.radiusKm)
+          .sort((a, b) => a.distanceKm! - b.distanceKm!)
+        setSearchResults(withDistance)
+      }
     }
     catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Unknown error'
@@ -96,7 +110,7 @@ export function useRadarSearch() {
     finally {
       setIsLoading(false)
     }
-  }, [setIsLoading, setError, setSearchResults])
+  }, [setIsLoading, setError, setSearchResults, searchMode])
 
   return { search, isLoading, error, results }
 }

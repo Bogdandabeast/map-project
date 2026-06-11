@@ -11,6 +11,8 @@ export interface MapState {
   zoom: number
   /** Search radius in kilometers */
   searchRadius: number
+  /** Search mode: nearby (bbox+haversine) or global (all events by date) */
+  searchMode: 'nearby' | 'global'
   searchResults: SearchResult[]
   filters: FilterState
   isLoading: boolean
@@ -45,6 +47,12 @@ export interface MapActions {
    * @param radius number
    */
   setSearchRadius: (radius: number) => void
+
+  /**
+   * Sets the search mode: 'nearby' (bbox + haversine) or 'global' (all events by date)
+   * @param mode 'nearby' | 'global'
+   */
+  setSearchMode: (mode: 'nearby' | 'global') => void
 
   /**
    * Sets the search results

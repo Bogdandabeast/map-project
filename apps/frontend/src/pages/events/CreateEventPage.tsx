@@ -14,6 +14,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { ImageUpload } from '../../components/events/ImageUpload'
+import { LocationPicker } from '../../components/discovery/LocationPicker'
 import { AppLayout } from '../../components/layout/AppLayout'
 import { useEventsStore } from '../../stores/eventsStore'
 
@@ -90,6 +91,8 @@ function CreateEventForm() {
   const [imageKey, setImageKey] = useState<string | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
   const [createdEventId, setCreatedEventId] = useState<string | null>(null)
+  const [lat, setLat] = useState<number | undefined>(undefined)
+  const [lng, setLng] = useState<number | undefined>(undefined)
 
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const minDate = useMemo(() => new Date(Date.now() + 3600000).toISOString(), [])
@@ -120,6 +123,8 @@ function CreateEventForm() {
     const event = await createEvent({
       title: title.trim(),
       address: address.trim(),
+      lat,
+      lng,
       // TODO: implement geocoding — remove optional omission when implemented
       date: dateMs,
       capacity,
@@ -146,6 +151,14 @@ function CreateEventForm() {
   return (
     <div style={{ padding: '1rem', maxWidth: '600px', margin: '0 auto' }}>
       <h1 data-testid="create-event-title">Create event</h1>
+
+      {/* Location Picker — draggable pin mini-map */}
+      <LocationPicker
+        onLocationChange={(newLat: number, newLng: number) => {
+          setLat(newLat)
+          setLng(newLng)
+        }}
+      />
 
       <form onSubmit={handleSubmit} data-testid="create-event-form">
         {/* Title */}
