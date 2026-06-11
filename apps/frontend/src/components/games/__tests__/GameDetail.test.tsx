@@ -59,9 +59,9 @@ describe('GameDetail', () => {
         <GameDetail game={fullGame} />
       </MemoryRouter>,
     )
-    const img = screen.getByTestId('game-detail-cover') as HTMLImageElement
-    expect(img.src).toBe('https://example.com/catan.jpg')
-    expect(img.alt).toBe('Catan')
+    const img = screen.getByTestId('game-detail-cover')
+    expect(img.getAttribute('src')).toBe('https://example.com/catan.jpg')
+    expect(img.getAttribute('alt')).toBe('Catan')
   })
 
   it('renders placeholder when coverImage is null', () => {

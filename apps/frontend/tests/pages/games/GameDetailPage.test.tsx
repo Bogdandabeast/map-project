@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, mock } from 'bun:test'
 import { MemoryRouter, Route } from 'react-router-dom'
+import type { Game } from '@repo/types'
 
 // ── Mock auth ──────────────────────────────────────────────────────
 mock.module('../../../src/components/auth/AuthProvider', () => ({
@@ -13,7 +14,7 @@ mock.module('../../../src/components/auth/AuthProvider', () => ({
 }))
 
 // ── Mock games service ─────────────────────────────────────────────
-let mockGameData: any = null
+let mockGameData: Game | null = null
 
 mock.module('../../../src/services/games', () => ({
   searchGames: () => Promise.resolve({ source: 'd1', results: [] }),
@@ -28,7 +29,7 @@ import { GameDetailPage } from '../../../src/pages/GameDetailPage'
 
 // ── Test data ─────────────────────────────────────────────────────
 
-const mockGame = {
+const mockGame: Game = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   title: 'Catan',
   description: 'A classic trading game.',
@@ -62,12 +63,15 @@ describe('GameDetailPage', () => {
     mockGameData = null
   })
 
-  it('renders loading spinner initially', () => {
-    // game data not yet resolved
-    mockGameData = new Promise(() => {}) // never resolves
+  it('renders loading spinner initially', async () => {
+    let resolvePromise!: (value: Game) => void
+    mockGameData = new Promise<Game>((resolve) => { resolvePromise = resolve })
     renderPage('550e8400-e29b-41d4-a716-446655440000')
 
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+
+    // Clean up: resolve the promise so the test can finish
+    resolvePromise(mockGame)
   })
 
   it('renders game detail when game loads', async () => {

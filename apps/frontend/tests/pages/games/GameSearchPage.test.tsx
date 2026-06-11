@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, mock } from 'bun:test'
 import { MemoryRouter, Route } from 'react-router-dom'
+import type { SearchResponse } from '../../../src/services/games'
 
 // ── Mock auth ──────────────────────────────────────────────────────
 mock.module('../../../src/components/auth/AuthProvider', () => ({
@@ -13,8 +14,8 @@ mock.module('../../../src/components/auth/AuthProvider', () => ({
 }))
 
 // ── Mock games service — mutable for different test scenarios ──────
-let mockSearchImpl = async (_q: string, _limit?: number) =>
-  ({ source: 'd1', results: [] as any[] })
+let mockSearchImpl = async (_q: string, _limit?: number): Promise<SearchResponse> =>
+  ({ source: 'd1', results: [] })
 
 mock.module('../../../src/services/games', () => ({
   searchGames: (q: string, limit?: number) => mockSearchImpl(q, limit),

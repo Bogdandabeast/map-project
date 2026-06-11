@@ -8,7 +8,6 @@ import {
   IonToolbar,
 } from '@ionic/react'
 import { useState } from 'react'
-import { ProtectedRoute } from '../components/auth/ProtectedRoute'
 import { SearchResults } from '../components/games/SearchResults'
 import { EmptyState } from '../components/shared/EmptyState'
 import { ErrorState } from '../components/shared/ErrorState'
@@ -17,14 +16,6 @@ import { searchGames } from '../services/games'
 import type { SearchResponse } from '../services/games'
 
 export function GameSearchPage() {
-  return (
-    <ProtectedRoute>
-      <GameSearchContent />
-    </ProtectedRoute>
-  )
-}
-
-function GameSearchContent() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<SearchResponse | null>(null)
@@ -44,11 +35,11 @@ function GameSearchContent() {
     try {
       const result = await searchGames(q)
       setResponse(result)
-    } catch {
+    } catch (err) {
       setResponse({
         source: 'd1',
         results: [],
-        note: 'Search is temporarily limited. BGG API unavailable.',
+        note: err instanceof Error ? err.message : 'Search is temporarily unavailable',
       })
     } finally {
       setLoading(false)
@@ -95,10 +86,7 @@ function GameSearchContent() {
           {loading && <LoadingSpinner message="Searching games..." />}
 
           {!loading && hasResults && response && (
-            <SearchResults
-              results={response.results}
-              source={response.source}
-            />
+            <SearchResults results={response.results} />
           )}
 
           {!loading && isEmpty && hasNote && (

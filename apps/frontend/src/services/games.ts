@@ -57,7 +57,7 @@ export interface SearchResponse {
 /** GET /api/games/search?q=&limit= */
 export async function searchGames(q: string, limit?: number): Promise<SearchResponse> {
   const params = new URLSearchParams({ q })
-  if (limit) params.set('limit', String(limit))
+  if (limit !== undefined) params.set('limit', String(limit))
   return request<SearchResponse>(`/api/games/search?${params.toString()}`)
 }
 
@@ -69,7 +69,7 @@ export async function getGameById(id: string): Promise<Game> {
 /** GET /api/games/popular */
 export async function getPopularGames(limit?: number): Promise<Game[]> {
   const params = new URLSearchParams()
-  if (limit) params.set('limit', String(limit))
+  if (limit !== undefined) params.set('limit', String(limit))
   const query = params.toString() ? `?${params.toString()}` : ''
   return request<Game[]>(`/api/games/popular${query}`)
 }
@@ -77,7 +77,7 @@ export async function getPopularGames(limit?: number): Promise<Game[]> {
 /** GET /api/games/recent */
 export async function getRecentGames(limit?: number): Promise<Game[]> {
   const params = new URLSearchParams()
-  if (limit) params.set('limit', String(limit))
+  if (limit !== undefined) params.set('limit', String(limit))
   const query = params.toString() ? `?${params.toString()}` : ''
   return request<Game[]>(`/api/games/recent${query}`)
 }

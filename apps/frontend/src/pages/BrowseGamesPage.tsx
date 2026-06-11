@@ -8,10 +8,10 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react'
-import { useEffect, useState } from 'react'
-import { ProtectedRoute } from '../components/auth/ProtectedRoute'
+import { useCallback, useEffect, useState } from 'react'
 import { GameCard } from '../components/games/GameCard'
 import { EmptyState } from '../components/shared/EmptyState'
+import { ErrorState } from '../components/shared/ErrorState'
 import { LoadingSpinner } from '../components/shared/LoadingSpinner'
 import { getPopularGames, getRecentGames } from '../services/games'
 import type { Game } from '@repo/types'
@@ -19,35 +19,30 @@ import type { Game } from '@repo/types'
 type Tab = 'popular' | 'recent'
 
 export function BrowseGamesPage() {
-  return (
-    <ProtectedRoute>
-      <BrowseGamesContent />
-    </ProtectedRoute>
-  )
-}
-
-function BrowseGamesContent() {
   const [tab, setTab] = useState<Tab>('popular')
   const [games, setGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
-  const loadGames = async (selectedTab: Tab) => {
+  const loadGames = useCallback(async (selectedTab: Tab) => {
     setLoading(true)
+    setLoadError(null)
     try {
       const data = selectedTab === 'popular'
         ? await getPopularGames()
         : await getRecentGames()
       setGames(data)
-    } catch {
+    } catch (err) {
       setGames([])
+      setLoadError(err instanceof Error ? err.message : 'Failed to load games')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     loadGames('popular')
-  }, [])
+  }, [loadGames])
 
   const handleTabChange = (selectedTab: Tab) => {
     if (selectedTab !== tab) {
@@ -87,7 +82,11 @@ function BrowseGamesContent() {
         <div style={{ padding: '1rem', maxWidth: '800px', margin: '0 auto' }}>
           {loading && <LoadingSpinner message="Loading games..." />}
 
-          {!loading && games.length > 0 && (
+          {!loading && loadError && (
+            <ErrorState message={loadError} />
+          )}
+
+          {!loading && !loadError && games.length > 0 && (
             <div>
               {games.map((game) => (
                 <GameCard key={game.id} game={game} />
@@ -95,7 +94,7 @@ function BrowseGamesContent() {
             </div>
           )}
 
-          {!loading && games.length === 0 && (
+          {!loading && !loadError && games.length === 0 && (
             <EmptyState
               message={
                 tab === 'popular'

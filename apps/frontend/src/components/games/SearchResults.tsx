@@ -12,7 +12,6 @@ function sourceLabel(source: string): string {
 
 export interface SearchResultsProps {
   results: GameSearchResult[]
-  source: 'd1' | 'bgg'
 }
 
 export function SearchResults({ results }: SearchResultsProps) {

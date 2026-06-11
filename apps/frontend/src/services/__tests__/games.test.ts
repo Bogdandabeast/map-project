@@ -39,8 +39,10 @@ const mockSearchResult = {
 // ── Tests ─────────────────────────────────────────────────────────
 
 describe('games service', () => {
+  const originalFetch = globalThis.fetch
+
   afterEach(() => {
-    // Reset fetch
+    globalThis.fetch = originalFetch
   })
 
   it('searchGames calls GET /api/games/search with query params', async () => {

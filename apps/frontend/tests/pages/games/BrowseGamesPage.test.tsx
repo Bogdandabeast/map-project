@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, mock } from 'bun:test'
 import { MemoryRouter } from 'react-router-dom'
+import type { Game } from '@repo/types'
 
 // ── Mock auth ──────────────────────────────────────────────────────
 mock.module('../../../src/components/auth/AuthProvider', () => ({
@@ -13,8 +14,8 @@ mock.module('../../../src/components/auth/AuthProvider', () => ({
 }))
 
 // ── Mock games service — mutable ──────────────────────────────────
-let mockPopularGames: any[] = []
-let mockRecentGames: any[] = []
+let mockPopularGames: Game[] = []
+let mockRecentGames: Game[] = []
 
 mock.module('../../../src/services/games', () => ({
   searchGames: () => Promise.resolve({ source: 'd1', results: [] }),
@@ -27,28 +28,39 @@ import { BrowseGamesPage } from '../../../src/pages/BrowseGamesPage'
 
 // ── Test data ─────────────────────────────────────────────────────
 
-const game1 = {
+const game1: Game = {
   id: '11111111-1111-4111-a111-111111111111',
   title: 'Catan',
+  description: null,
+  imageUrl: null,
   minPlayers: 3,
   maxPlayers: 4,
   duration: 90,
   coverImage: null,
+  bggId: null,
   source: 'manual',
   accessCount: 42,
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
 }
 
-const game2 = {
+const game2: Game = {
   id: '22222222-2222-4222-a222-222222222222',
   title: 'Wingspan',
+  description: null,
+  imageUrl: null,
   minPlayers: 1,
   maxPlayers: 5,
   duration: 70,
   coverImage: null,
+  bggId: null,
   source: 'bgg',
   accessCount: 15,
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
 }
 
+// happy-dom does not propagate .value on custom elements — set it explicitly before dispatching
 function switchTab(value: string) {
   const segment = screen.getByTestId('browse-segment') as any
   Object.defineProperty(segment, 'value', { value, writable: true, configurable: true })

@@ -9,28 +9,23 @@ import {
 } from '@ionic/react'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ProtectedRoute } from '../components/auth/ProtectedRoute'
 import { GameDetail } from '../components/games/GameDetail'
 import { LoadingSpinner } from '../components/shared/LoadingSpinner'
 import { getGameById } from '../services/games'
 import type { Game } from '@repo/types'
 
 export function GameDetailPage() {
-  return (
-    <ProtectedRoute>
-      <GameDetailContent />
-    </ProtectedRoute>
-  )
-}
-
-function GameDetailContent() {
   const { id } = useParams<{ id: string }>()
   const [game, setGame] = useState<Game | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    if (!id) return
+    if (!id) {
+      setLoading(false)
+      setError(true)
+      return
+    }
 
     setLoading(true)
     setError(false)
