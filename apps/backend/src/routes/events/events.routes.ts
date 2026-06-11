@@ -2,6 +2,7 @@
  * Events CRUD routes — Drizzle inline (no repository layer).
  *
  * POST   /api/events           — Create event
+ * GET    /api/events?bbox=...  — Public event discovery (bbox search)
  * PATCH  /api/events/:id       — Edit event (creator only)
  * DELETE /api/events/:id       — Delete event (creator or mod/admin)
  * POST   /api/events/:id/cancel — Cancel event (creator only)
@@ -19,11 +20,12 @@ import {
   createEventSchema,
   updateEventSchema,
 } from '@repo/validations/events'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { createAuth } from '../../db/lib/auth'
 import { createDb } from '../../db/lib/database'
 import { events } from '../../db/schema/events-core'
+import { optionalAuthMiddleware } from '../../middlewares/optionalAuth'
 import { requireRoleMiddleware } from '../../middlewares/requireRole'
 
 // ── Options ──────────────────────────────────────────────────────────
@@ -72,6 +74,65 @@ export function createEventRoutes(options: EventRoutesOptions = {}) {
     'moderator',
     'admin',
   ])
+
+  // Public discovery endpoint (visitor-accessible)
+  const optionalAuth = optionalAuthMiddleware(authFactory)
+
+  // ── GET / — Public event discovery by bbox ──────────────────────
+
+  routes.get('/', optionalAuth, async (c) => {
+    const bbox = c.req.query('bbox')
+    if (!bbox) {
+      return c.json({ error: 'bbox parameter required (minLng,minLat,maxLng,maxLat)' }, 400)
+    }
+
+    const parts = bbox.split(',').map(Number)
+    if (parts.length !== 4 || parts.some(isNaN)) {
+      return c.json({ error: 'bbox must be four comma-separated numbers' }, 400)
+    }
+
+    const [minLng, minLat, maxLng, maxLat] = parts
+    const db = getDb(c.env)
+
+    const found = await db
+      .select()
+      .from(events)
+      .where(
+        sql`${events.lat} >= ${minLat} AND ${events.lat} <= ${maxLat}
+            AND ${events.lng} >= ${minLng} AND ${events.lng} <= ${maxLng}
+            AND ${events.status} != 'cancelled'`,
+      )
+      .all()
+
+    // Map to response shape matching existing event response format
+    const mapped = found.map((event) => {
+      const computedStatus = computeEventStatus({
+        status: event.status,
+        date: event.date,
+        capacity: event.capacity,
+      })
+
+      return {
+        id: event.id,
+        title: event.title,
+        address: event.address,
+        lat: event.lat,
+        lng: event.lng,
+        date: event.date,
+        capacity: event.capacity,
+        plannedGames: event.plannedGames,
+        skillLevel: event.skillLevel,
+        atmosphere: event.atmosphere,
+        imageKey: event.imageKey,
+        creatorId: event.creatorId,
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt,
+        status: computedStatus,
+      }
+    })
+
+    return c.json(mapped)
+  })
 
   // ── POST / — Create event ──────────────────────────────────────
 
