@@ -49,10 +49,15 @@ export const useMapStore = create<MapStore>(set => ({
     }),
 
   /**
-   * Sets the search radius in kilometers
-   * @param radius number
+   * Sets the search radius in kilometers.
+   * Rejects non-positive values and avoids updates when the value hasn't changed.
+   * @param radius number (must be > 0)
    */
-  setSearchRadius: radius => set({ searchRadius: radius }),
+  setSearchRadius: radius =>
+    set((state) => {
+      if (radius <= 0) return state
+      return Math.abs(state.searchRadius - radius) < EPSILON ? state : { searchRadius: radius }
+    }),
 
   /**
    * Sets the search results

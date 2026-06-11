@@ -39,7 +39,7 @@ function toEventMarker(event: EventData): EventMarker {
     lat: event.lat,
     lng: event.lng,
     date: event.date,
-    hostType: event.creatorId ? 'user' : 'venue',
+    hostType: 'user',
     games: event.plannedGames ?? [],
     skillLevel: event.skillLevel ?? undefined,
     atmosphere: event.atmosphere ?? undefined,

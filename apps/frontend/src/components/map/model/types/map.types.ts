@@ -9,6 +9,7 @@ export interface MapState {
   map: Map | null
   center: [number, number]
   zoom: number
+  /** Search radius in kilometers */
   searchRadius: number
   searchResults: SearchResult[]
   filters: FilterState

@@ -42,11 +42,11 @@ describe('discovery types', () => {
 
   it('SearchParams type accepts center and radius', () => {
     const params: SearchParams = {
-      center: [-34.6037, -58.3816],
+      center: [-58.3816, -34.6037],
       radiusKm: 5,
     }
 
-    expect(params.center).toEqual([-34.6037, -58.3816])
+    expect(params.center).toEqual([-58.3816, -34.6037])
     expect(params.radiusKm).toBe(5)
   })
 
